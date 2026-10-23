@@ -16,11 +16,21 @@ const POKEMONS = [
 export default function Index() {
   const [balls, setBalls] = useState(0);
   const [feuSeulement, setFeuSeulement] = useState(false);
+  const [captured, setCaptured] = useState([]); // les numéros capturés
 
   // la liste a afficher, recalculee a chaque clic
   const visibles = feuSeulement
     ? POKEMONS.filter((p) => p.type === "Feu")
     : POKEMONS;
+
+  // capturer ou relâcher un Pokémon
+  function toggle(number) {
+    if (captured.includes(number)) {
+      setCaptured(captured.filter((n) => n !== number));
+    } else {
+      setCaptured([...captured, number]);
+    }
+  }
 
   function ajouter() {
     // on ne monte jamais au-dessus de 10
@@ -39,6 +49,7 @@ export default function Index() {
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.contenu}>
       <Titre texte="Mon Pokédex" sousTitre={`${POKEMONS.length} Pokémon`} />
+      <Text style={styles.captures}>{captured.length} Pokémon capturés</Text>
 
       <Aide />
 
@@ -66,7 +77,14 @@ export default function Index() {
       </Pressable>
 
       {visibles.map((p) => (
-        <PokemonCard key={p.number} number={p.number} name={p.name} type={p.type} />
+        <PokemonCard
+          key={p.number}
+          number={p.number}
+          name={p.name}
+          type={p.type}
+          captured={captured.includes(p.number)}
+          onToggle={() => toggle(p.number)}
+        />
       ))}
     </ScrollView>
   );
@@ -75,6 +93,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: "#f3f4f6" },
   contenu: { padding: 20 },
+  captures: { fontSize: 15, fontWeight: "bold", color: "#16a34a", marginBottom: 16 },
   sac: { alignItems: "center", marginBottom: 20 },
   balls: { fontSize: 22, fontWeight: "bold", color: "#111827" },
   boutons: { flexDirection: "row", gap: 10, marginTop: 10 },

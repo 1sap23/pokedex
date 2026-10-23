@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { View, Text, Image, Pressable, StyleSheet } from "react-native";
 import TypeBadge, { TYPE_COLORS } from "./TypeBadge";
 
@@ -6,9 +5,7 @@ const ARTWORK =
   "https://raw.githubusercontent.com/PokeAPI/sprites" +
   "/master/sprites/pokemon/other/official-artwork/";
 
-export default function PokemonCard({ number, name, type }) {
-  const [captured, setCaptured] = useState(false);
-
+export default function PokemonCard({ number, name, type, captured, onToggle }) {
   // la couleur de la carte depend du type
   const color = TYPE_COLORS[type] ?? "#A8A878";
 
@@ -29,7 +26,7 @@ export default function PokemonCard({ number, name, type }) {
 
       <Pressable
         style={[styles.bouton, captured && styles.boutonCapture]}
-        onPress={() => setCaptured(!captured)}
+        onPress={onToggle}
       >
         <Text style={styles.boutonTexte}>{captured ? "Capturé" : "Capturer"}</Text>
       </Pressable>
