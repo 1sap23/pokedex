@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
 import Titre from "../components/Titre";
 import PokemonCard from "../components/PokemonCard";
+import Aide from "../components/Aide";
 
 const POKEMONS = [
   { number: 1, name: "Bulbizarre", type: "Plante" },
@@ -35,6 +36,8 @@ export default function Index() {
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.contenu}>
       <Titre texte="Mon Pokédex" sousTitre={`${POKEMONS.length} Pokémon`} />
+
+      <Aide />
 
       <View style={styles.sac}>
         <Text style={styles.balls}>Poké Balls : {balls}</Text>
