@@ -14,7 +14,8 @@ export default function Aide() {
 
       {visible && (
         <Text style={styles.texte}>
-          Appuyez sur Capturer pour ajouter un Pokémon à votre équipe.
+          Golden brown, the commencement of evil forebodings. Heading south,
+          the breeze from the icy climes of the north was never strangled.
         </Text>
       )}
     </View>
