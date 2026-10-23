@@ -13,11 +13,14 @@ const POKEMONS = [
   { number: 43, name: "Mystherbe", type: "Plante" },
 ];
 
-// Bonus : seulement les Pokémon de type Feu
-const feu = POKEMONS.filter((p) => p.type === "Feu");
-
 export default function Index() {
   const [balls, setBalls] = useState(0);
+  const [feuSeulement, setFeuSeulement] = useState(false);
+
+  // la liste a afficher, recalculee a chaque clic
+  const visibles = feuSeulement
+    ? POKEMONS.filter((p) => p.type === "Feu")
+    : POKEMONS;
 
   function ajouter() {
     // on ne monte jamais au-dessus de 10
@@ -56,17 +59,15 @@ export default function Index() {
         </Pressable>
       </View>
 
-      {POKEMONS.map((p) => (
+      <Pressable style={styles.filtre} onPress={() => setFeuSeulement(!feuSeulement)}>
+        <Text style={styles.viderTexte}>
+          {feuSeulement ? "Tout afficher" : "Seulement le type Feu"}
+        </Text>
+      </Pressable>
+
+      {visibles.map((p) => (
         <PokemonCard key={p.number} number={p.number} name={p.name} type={p.type} />
       ))}
-
-      <View style={styles.section}>
-        <Titre texte="Type Feu" sousTitre={`${feu.length} Pokémon`} />
-
-        {feu.map((p) => (
-          <PokemonCard key={p.number} number={p.number} name={p.name} type={p.type} />
-        ))}
-      </View>
     </ScrollView>
   );
 }
@@ -74,7 +75,6 @@ export default function Index() {
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: "#f3f4f6" },
   contenu: { padding: 20 },
-  section: { marginTop: 24 },
   sac: { alignItems: "center", marginBottom: 20 },
   balls: { fontSize: 22, fontWeight: "bold", color: "#111827" },
   boutons: { flexDirection: "row", gap: 10, marginTop: 10 },
@@ -82,4 +82,5 @@ const styles = StyleSheet.create({
   boutonTexte: { color: "#ffffff", fontSize: 24, fontWeight: "bold" },
   vider: { marginTop: 10, borderWidth: 2, borderColor: "#2f5be7", borderRadius: 10, paddingVertical: 8, paddingHorizontal: 16 },
   viderTexte: { color: "#2f5be7", fontWeight: "bold" },
+  filtre: { alignSelf: "flex-start", marginBottom: 12, borderWidth: 2, borderColor: "#2f5be7", borderRadius: 10, paddingVertical: 8, paddingHorizontal: 16 },
 });
