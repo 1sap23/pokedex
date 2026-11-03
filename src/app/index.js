@@ -18,13 +18,18 @@ import POKEMONS from "../data/pokemons"; // séance 4 : les 100 premiers Pokémo
 
 export default function Index() {
   const [balls, setBalls] = useState(0);
-  const [feuSeulement, setFeuSeulement] = useState(false);
+  // ANCIEN (séance 3) : le filtre Feu, remplacé par « Mes captures »
+  // const [feuSeulement, setFeuSeulement] = useState(false);
+  const [capturesSeulement, setCapturesSeulement] = useState(false);
   const [captured, setCaptured] = useState([]); // les numéros capturés
   const [search, setSearch] = useState("");
 
   // la liste a afficher, recalculee a chaque clic
-  const parType = feuSeulement
-    ? POKEMONS.filter((p) => p.type === "Feu")
+  // const parType = feuSeulement
+  //   ? POKEMONS.filter((p) => p.type === "Feu")
+  //   : POKEMONS;
+  const parType = capturesSeulement
+    ? POKEMONS.filter((p) => captured.includes(p.number))
     : POKEMONS;
 
   // puis on garde seulement les noms qui contiennent la recherche
@@ -113,6 +118,7 @@ export default function Index() {
       style={styles.page}
       contentContainerStyle={styles.contenu}
       data={visibles}
+      extraData={captured} // redessiner les cartes quand captured change
       keyExtractor={(p) => String(p.number)}
       numColumns={2}
       columnWrapperStyle={styles.ligne}
@@ -147,9 +153,16 @@ export default function Index() {
             onChangeText={setSearch}
           />
 
+          {/* ANCIEN (séance 3) : le bouton du filtre Feu
           <Pressable style={styles.filtre} onPress={() => setFeuSeulement(!feuSeulement)}>
             <Text style={styles.viderTexte}>
               {feuSeulement ? "Tout afficher" : "Seulement le type Feu"}
+            </Text>
+          </Pressable>
+          */}
+          <Pressable style={styles.filtre} onPress={() => setCapturesSeulement(!capturesSeulement)}>
+            <Text style={styles.viderTexte}>
+              {capturesSeulement ? "Tout afficher" : "Mes captures"}
             </Text>
           </Pressable>
 
