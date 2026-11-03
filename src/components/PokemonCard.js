@@ -18,7 +18,8 @@ export default function PokemonCard({ number, name, type, captured, onToggle }) 
       ]}
     >
       <Image source={{ uri: ARTWORK + number + ".png" }} style={styles.image} />
-      <View style={{ flex: 1 }}>
+      {/* ANCIEN (séance 3, une seule colonne) : <View style={{ flex: 1 }}> */}
+      <View style={styles.infos}>
         <Text style={styles.numero}>#{number}</Text>
         <Text style={styles.nom}>{name}</Text>
         <TypeBadge type={type} />
@@ -35,19 +36,32 @@ export default function PokemonCard({ number, name, type, captured, onToggle }) 
 }
 
 const styles = StyleSheet.create({
+  // ANCIEN (séance 3) : la carte en ligne, image à gauche et texte à droite
+  // card: {
+  //   flexDirection: "row",
+  //   alignItems: "center",
+  //   gap: 16,
+  //   padding: 12,
+  //   marginBottom: 10,
+  //   borderRadius: 14,
+  //   borderWidth: 2,
+  // },
+
+  // séance 4 : la carte en colonne, pour tenir dans une grille de 2
   card: {
-    flexDirection: "row",
+    flex: 1, // chaque carte prend la moitié de la ligne
     alignItems: "center",
-    gap: 16,
+    gap: 8,
     padding: 12,
     marginBottom: 10,
     borderRadius: 14,
     borderWidth: 2,
   },
+  infos: { alignItems: "center" },
   capturee: { borderWidth: 4, backgroundColor: "#fff7d6" },
   image: { width: 80, height: 80 },
   numero: { fontSize: 12, color: "#6b7280" },
-  nom: { fontSize: 18, fontWeight: "bold", color: "#111827" },
+  nom: { fontSize: 16, fontWeight: "bold", color: "#111827" },
   bouton: { backgroundColor: "#2f5be7", paddingVertical: 8, paddingHorizontal: 12, borderRadius: 10 },
   boutonCapture: { backgroundColor: "#16a34a" },
   boutonTexte: { color: "#ffffff", fontWeight: "bold" },
