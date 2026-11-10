@@ -5,6 +5,16 @@ export const TYPE_COLORS = {
   Feu: "#F08030",
   Eau: "#6890F0",
   Électrik: "#F8D030",
+  // séance 4 : les autres types des 100 premiers Pokémon
+  Normal: "#A8A878",
+  Insecte: "#A8B820",
+  Poison: "#A040A0",
+  Sol: "#E0C068",
+  Fée: "#EE99AC",
+  Combat: "#C03028",
+  Psy: "#F85888",
+  Roche: "#B8A038",
+  Spectre: "#705898",
 };
 
 export default function TypeBadge({ type }) {
