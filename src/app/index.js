@@ -119,7 +119,7 @@ export default function Index() {
       contentContainerStyle={styles.contenu}
       data={visibles}
       extraData={captured} // redessiner les cartes quand captured change
-      keyExtractor={(p) => String(p.number)}
+      keyExtractor={(item) => String(item.number)}
       numColumns={2}
       columnWrapperStyle={styles.ligne}
       ListHeaderComponent={

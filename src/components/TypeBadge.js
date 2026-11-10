@@ -18,7 +18,7 @@ export const TYPE_COLORS = {
 };
 
 export default function TypeBadge({ type }) {
-  const color = TYPE_COLORS[type] ?? "#A8A878";
+  const color = TYPE_COLORS[type];
   return (
     <View style={[styles.badge, { backgroundColor: color }]}>
       <Text style={styles.texte}>{type}</Text>
@@ -27,6 +27,6 @@ export default function TypeBadge({ type }) {
 }
 
 const styles = StyleSheet.create({
-  badge: { alignSelf: "flex-start", paddingVertical: 3, paddingHorizontal: 10, borderRadius: 12, marginTop: 4 },
+  badge: { alignSelf: "center", paddingVertical: 3, paddingHorizontal: 10, borderRadius: 12, marginTop: 4 },
   texte: { color: "#ffffff", fontSize: 12, fontWeight: "bold" },
 });

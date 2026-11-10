@@ -7,7 +7,7 @@ const ARTWORK =
 
 export default function PokemonCard({ number, name, type, captured, onToggle }) {
   // la couleur de la carte depend du type
-  const color = TYPE_COLORS[type] ?? "#A8A878";
+  const color = TYPE_COLORS[type];
 
   return (
     <View
@@ -17,7 +17,7 @@ export default function PokemonCard({ number, name, type, captured, onToggle }) 
         captured && styles.capturee,
       ]}
     >
-      <Image source={{ uri: ARTWORK + number + ".png" }} style={styles.image} />
+      <Image source={{ uri: `${ARTWORK}${number}.png` }} style={styles.image} />
       {/* ANCIEN (séance 3, une seule colonne) : <View style={{ flex: 1 }}> */}
       <View style={styles.infos}>
         <Text style={styles.numero}>#{number}</Text>
