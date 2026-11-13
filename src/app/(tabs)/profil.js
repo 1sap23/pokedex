@@ -1,9 +1,13 @@
-import { View, Text, Pressable, Alert, StyleSheet } from "react-native";
-import Tag from "../components/Tag";
-import Avatar from "../components/Avatar";
-import InfoLigne from "../components/InfoLigne";
+import { View, Text, Image, Pressable, Alert, StyleSheet } from "react-native";
+import Tag from "../../components/Tag";
+import Avatar from "../../components/Avatar";
+import InfoLigne from "../../components/InfoLigne";
 
 const INTERETS = ["STM32", "React Native", "Électronique"];
+
+const ARTWORK =
+  "https://raw.githubusercontent.com/PokeAPI/sprites" +
+  "/master/sprites/pokemon/other/official-artwork/";
 
 export default function Profil() {
   return (
@@ -22,6 +26,10 @@ export default function Profil() {
         <InfoLigne label="Email" value="moi@ecole.fr" />
         <InfoLigne label="Ville" value="Toulon" />
         <InfoLigne label="École" value="ISEN Méditerranée" />
+
+        <Text style={styles.prefereTitre}>Mon Pokémon préféré</Text>
+        <Image source={{ uri: `${ARTWORK}25.png` }} style={styles.prefereImage} />
+        <Text style={styles.prefereNom}>Pikachu</Text>
 
         <View style={styles.contour}>
           <Pressable
@@ -51,6 +59,9 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 4,
   },
+  prefereTitre: { fontSize: 16, fontWeight: "bold", color: "#111827", marginTop: 18 },
+  prefereImage: { width: 120, height: 120 },
+  prefereNom: { fontSize: 18, fontWeight: "bold", color: "#111827" },
   nom: { fontSize: 24, fontWeight: "bold", color: "#111827" },
   description: { fontSize: 14, color: "#6b7280", marginTop: 4, marginBottom: 14 },
   tags: { flexDirection: "row", gap: 8, marginBottom: 14 },

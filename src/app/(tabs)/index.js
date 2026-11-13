@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { router } from "expo-router";
 // ANCIEN (séance 3) : import { ScrollView, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
 import { FlatList, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
-import Titre from "../components/Titre";
-import PokemonCard from "../components/PokemonCard";
-import Aide from "../components/Aide";
-import POKEMONS from "../data/pokemons"; // séance 4 : les 100 premiers Pokémon
+import Titre from "../../components/Titre";
+import PokemonCard from "../../components/PokemonCard";
+import Aide from "../../components/Aide";
+import POKEMONS from "../../data/pokemons"; // séance 4 : les 100 premiers Pokémon
 
 // ANCIEN (séance 2 et 3) : remplacé par src/data/pokemons.js
 // const POKEMONS = [
@@ -170,13 +171,18 @@ export default function Index() {
         </View>
       }
       renderItem={({ item }) => (
-        <PokemonCard
-          number={item.number}
-          name={item.name}
-          type={item.type}
-          captured={captured.includes(item.number)}
-          onToggle={() => toggle(item.number)}
-        />
+        <Pressable
+          style={styles.carte}
+          onPress={() => router.push(`/pokemon/${item.number}`)}
+        >
+          <PokemonCard
+            number={item.number}
+            name={item.name}
+            type={item.type}
+            captured={captured.includes(item.number)}
+            onToggle={() => toggle(item.number)}
+          />
+        </Pressable>
       )}
     />
   );
@@ -186,6 +192,7 @@ const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: "#f3f4f6" },
   contenu: { padding: 20 },
   ligne: { gap: 10 }, // espace entre les 2 colonnes
+  carte: { flex: 1 }, // le Pressable prend la moitié de la ligne, comme la carte
   captures: { fontSize: 15, fontWeight: "bold", color: "#16a34a", marginBottom: 16 },
   sac: { alignItems: "center", marginBottom: 20 },
   balls: { fontSize: 22, fontWeight: "bold", color: "#111827" },
