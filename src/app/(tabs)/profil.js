@@ -28,8 +28,9 @@ export default function Profil() {
         <InfoLigne label="École" value="ISEN Méditerranée" />
 
         <Text style={styles.prefereTitre}>Mon Pokémon préféré</Text>
-        <Image source={{ uri: `${ARTWORK}25.png` }} style={styles.prefereImage} />
-        <Text style={styles.prefereNom}>Pikachu</Text>
+        <Image source={{ uri: `${ARTWORK}493.png` }} style={styles.prefereImage} />
+        <Text style={styles.prefereNom}>Arceus</Text>
+        <Text style={styles.description}>J'adore les Pokémon légendaires</Text>
 
         <View style={styles.contour}>
           <Pressable
