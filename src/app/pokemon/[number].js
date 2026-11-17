@@ -2,7 +2,10 @@
 import { useState, useEffect } from "react";
 // ANCIEN (séance 6) : import { View, Text, Image, ActivityIndicator, StyleSheet } from "react-native";
 // ANCIEN (projet, étape 3) : import { ScrollView, View, Text, Image, ActivityIndicator, StyleSheet } from "react-native";
-import { ScrollView, View, Text, Image, Pressable, ActivityIndicator, StyleSheet } from "react-native";
+// ANCIEN (avant la phase 4) : import { ScrollView, View, Text, Image, Pressable, ActivityIndicator, StyleSheet } from "react-native";
+import { ScrollView, View, Text, Pressable, ActivityIndicator, StyleSheet } from "react-native";
+// phase 4 : l'Image d'expo-image garde les images en cache (plus rapide)
+import { Image } from "expo-image";
 // ANCIEN (séance 5 et 6) : import { Stack, useLocalSearchParams } from "expo-router";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 // ANCIEN (séance 5) : la fiche lisait pokemons.js, maintenant c'est la PokéAPI
@@ -11,12 +14,14 @@ import { Stack, router, useLocalSearchParams } from "expo-router";
 import TypeBadge, { TYPE_COLORS } from "../../components/TypeBadge";
 import { Ionicons } from "@expo/vector-icons";
 import Faiblesses from "../../components/Faiblesses";
+import { TYPES_FR } from "../../data/types";
 import { useCollection } from "../../context/Collection";
 
 const ARTWORK =
   "https://raw.githubusercontent.com/PokeAPI/sprites" +
   "/master/sprites/pokemon/other/official-artwork/";
 
+/* ANCIEN (séance 6 à phase 3) : déplacé dans src/data/types.js
 // l'API donne les types en anglais, on les traduit pour garder nos couleurs
 const TYPES_FR = {
   grass: "Plante",
@@ -39,6 +44,7 @@ const TYPES_FR = {
   dark: "Ténèbres",
   flying: "Vol",
 };
+*/
 
 // projet : le nom des statistiques en français
 const STATS_FR = {
@@ -206,7 +212,7 @@ export default function FichePokemon() {
   //   <View style={styles.page}>
   //     <Stack.Screen options={{ title: nom }} />
   //     <Text style={styles.numero}>#{pokemon.id}</Text>
-  //     <Image source={{ uri: `${ARTWORK}${pokemon.id}.png` }} style={styles.image} />
+  //     <Image source={{ uri: `${ARTWORK}${pokemon.id}.png` }} style={styles.image} contentFit="contain" cachePolicy="memory-disk" />
   //     <Text style={styles.nom}>{nom}</Text>
   //     <TypeBadge type={TYPES_FR[type] || type} />
   //
@@ -231,6 +237,9 @@ export default function FichePokemon() {
         <Image
           source={{ uri: `${ARTWORK}${shiny ? "shiny/" : ""}${pokemon.id}.png` }}
           style={styles.image}
+          contentFit="contain"
+          cachePolicy="memory-disk"
+          transition={300} // fondu de 0,3 seconde entre normal et Shiny
         />
         {/* phase 3 : les trois boutons sont sur une ligne */}
         <View style={styles.boutonsBandeau}>
@@ -391,7 +400,7 @@ export default function FichePokemon() {
                   style={[styles.evolution, e.number === pokemon.id && { borderColor: color }]}
                   onPress={() => router.push(`/pokemon/${e.number}`)}
                 >
-                  <Image source={{ uri: `${ARTWORK}${e.number}.png` }} style={styles.evolutionImage} />
+                  <Image source={{ uri: `${ARTWORK}${e.number}.png` }} style={styles.evolutionImage} contentFit="contain" cachePolicy="memory-disk" />
                   <Text style={styles.evolutionNom}>{e.name}</Text>
                   {/* phase 1 : comment on l'obtient */}
                   {e.condition !== "" && (

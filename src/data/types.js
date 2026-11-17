@@ -32,6 +32,29 @@ const TABLE = {
   Fée: { Combat: 2, Dragon: 2, Ténèbres: 2, Feu: 0.5, Poison: 0.5, Acier: 0.5 },
 };
 
+// l'API donne les types en anglais, on les traduit pour garder nos couleurs
+// phase 4 : déplacé ici depuis la fiche, la liste en a besoin aussi
+export const TYPES_FR = {
+  grass: "Plante",
+  fire: "Feu",
+  water: "Eau",
+  electric: "Électrik",
+  normal: "Normal",
+  bug: "Insecte",
+  poison: "Poison",
+  ground: "Sol",
+  fairy: "Fée",
+  fighting: "Combat",
+  psychic: "Psy",
+  rock: "Roche",
+  ghost: "Spectre",
+  ice: "Glace",
+  dragon: "Dragon",
+  steel: "Acier",
+  dark: "Ténèbres",
+  flying: "Vol",
+};
+
 // la liste des 18 types, dans l'ordre de la table
 export const TYPES = Object.keys(TABLE);
 

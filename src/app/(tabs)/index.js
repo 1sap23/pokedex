@@ -12,6 +12,7 @@ import PokemonCard from "../../components/PokemonCard";
 import Aide from "../../components/Aide";
 import REGIONS from "../../data/regions";
 import { useCollection } from "../../context/Collection";
+import { TYPES_FR } from "../../data/types";
 // ANCIEN (séance 4 et 5) : les 100 Pokémon écrits à la main, remplacés par la PokéAPI
 // import POKEMONS from "../../data/pokemons";
 
@@ -19,6 +20,20 @@ import { useCollection } from "../../context/Collection";
 // const API = "https://pokeapi.co/api/v2/pokemon?limit=151";
 // projet : l'adresse change selon la région, on la construit dans charger()
 const API = "https://pokeapi.co/api/v2/pokemon";
+
+// phase 4 : la PokéAPI a aussi une adresse GraphQL.
+// on lui écrit une question, et elle renvoie en UNE seule réponse
+// le nom français (language_id 5 = français) et les types de toute la région
+const GRAPHQL = "https://graphql.pokeapi.co/v1beta2";
+function question(debut, fin) {
+  return `{
+    pokemonspecies(where: { id: { _gte: ${debut}, _lte: ${fin} } }, order_by: { id: asc }) {
+      id
+      pokemonspeciesnames(where: { language_id: { _eq: 5 } }) { name }
+      pokemons(limit: 1) { pokemontypes(order_by: { slot: asc }) { type { name } } }
+    }
+  }`;
+}
 
 // ANCIEN (séance 2 et 3) : remplacé par src/data/pokemons.js
 // const POKEMONS = [
@@ -48,6 +63,29 @@ export default function Index() {
 
   // séance 6 : on va chercher la liste sur Internet
   async function charger() {
+    // phase 4 : on essaie d'abord GraphQL (noms français + types)
+    try {
+      const reponse = await fetch(GRAPHQL, {
+        method: "POST", // on envoie la question au serveur
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: question(region.debut, region.fin) }),
+      });
+      const data = await reponse.json();
+      const liste = data.data.pokemonspecies.map((p) => {
+        const nomFr = p.pokemonspeciesnames[0];
+        const typeAnglais = p.pokemons[0].pokemontypes[0].type.name;
+        return {
+          number: p.id,
+          name: nomFr ? nomFr.name : "???",
+          type: TYPES_FR[typeAnglais],
+        };
+      });
+      setPokemons(liste);
+      return; // c'est bon, on s'arrête là
+    } catch (erreur) {
+      // si GraphQL ne répond pas, on garde l'ancienne méthode juste en dessous
+    }
+
     // const reponse = await fetch(API);
     // offset : combien on en saute, limit : combien on en prend
     const offset = region.debut - 1;

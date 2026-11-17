@@ -1,4 +1,7 @@
-import { FlatList, View, Text, Image, Pressable, StyleSheet } from "react-native";
+// ANCIEN (avant la phase 4) : import { FlatList, View, Text, Image, Pressable, StyleSheet } from "react-native";
+import { FlatList, View, Text, Pressable, StyleSheet } from "react-native";
+// phase 4 : l'Image d'expo-image garde les images en cache (plus rapide)
+import { Image } from "expo-image";
 import { router } from "expo-router";
 import TypeBadge, { TYPE_COLORS } from "../../components/TypeBadge";
 import { useCollection } from "../../context/Collection";
@@ -33,7 +36,7 @@ export default function Favoris() {
             style={[styles.carte, { backgroundColor: color + "33", borderColor: color }]}
             onPress={() => router.push(`/pokemon/${item.number}`)}
           >
-            <Image source={{ uri: `${ARTWORK}${item.number}.png` }} style={styles.image} />
+            <Image source={{ uri: `${ARTWORK}${item.number}.png` }} style={styles.image} contentFit="contain" cachePolicy="memory-disk" />
             <Text style={styles.numero}>#{item.number}</Text>
             <Text style={styles.nom}>{item.name}</Text>
             <View style={styles.types}>

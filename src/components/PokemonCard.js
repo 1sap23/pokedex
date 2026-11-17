@@ -1,4 +1,7 @@
-import { View, Text, Image, Pressable, StyleSheet } from "react-native";
+// ANCIEN (avant la phase 4) : import { View, Text, Image, Pressable, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+// phase 4 : l'Image d'expo-image garde les images en cache (plus rapide)
+import { Image } from "expo-image";
 import TypeBadge, { TYPE_COLORS } from "./TypeBadge";
 
 const ARTWORK =
@@ -19,7 +22,7 @@ export default function PokemonCard({ number, name, type, captured, onToggle }) 
         captured && styles.capturee,
       ]}
     >
-      <Image source={{ uri: `${ARTWORK}${number}.png` }} style={styles.image} />
+      <Image source={{ uri: `${ARTWORK}${number}.png` }} style={styles.image} contentFit="contain" cachePolicy="memory-disk" />
       {/* ANCIEN (séance 3, une seule colonne) : <View style={{ flex: 1 }}> */}
       <View style={styles.infos}>
         <Text style={styles.numero}>#{number}</Text>

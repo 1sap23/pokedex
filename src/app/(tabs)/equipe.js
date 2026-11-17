@@ -1,4 +1,7 @@
-import { ScrollView, View, Text, Image, Pressable, StyleSheet } from "react-native";
+// ANCIEN (avant la phase 4) : import { ScrollView, View, Text, Image, Pressable, StyleSheet } from "react-native";
+import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
+// phase 4 : l'Image d'expo-image garde les images en cache (plus rapide)
+import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import TypeBadge, { TYPE_COLORS } from "../../components/TypeBadge";
@@ -58,7 +61,7 @@ export default function Equipe() {
               <Pressable style={styles.retirer} onPress={() => toggleEquipe(p)}>
                 <Ionicons name="close" size={14} color="#ffffff" />
               </Pressable>
-              <Image source={{ uri: `${ARTWORK}${p.number}.png` }} style={styles.image} />
+              <Image source={{ uri: `${ARTWORK}${p.number}.png` }} style={styles.image} contentFit="contain" cachePolicy="memory-disk" />
               <Text style={styles.nom}>{p.name}</Text>
             </Pressable>
           );
