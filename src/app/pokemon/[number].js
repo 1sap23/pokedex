@@ -1,8 +1,10 @@
 // ANCIEN (séance 5) : import { View, Text, Image, StyleSheet } from "react-native";
 import { useState, useEffect } from "react";
 // ANCIEN (séance 6) : import { View, Text, Image, ActivityIndicator, StyleSheet } from "react-native";
-import { ScrollView, View, Text, Image, ActivityIndicator, StyleSheet } from "react-native";
-import { Stack, useLocalSearchParams } from "expo-router";
+// ANCIEN (projet, étape 3) : import { ScrollView, View, Text, Image, ActivityIndicator, StyleSheet } from "react-native";
+import { ScrollView, View, Text, Image, Pressable, ActivityIndicator, StyleSheet } from "react-native";
+// ANCIEN (séance 5 et 6) : import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 // ANCIEN (séance 5) : la fiche lisait pokemons.js, maintenant c'est la PokéAPI
 // import POKEMONS from "../../data/pokemons";
 // ANCIEN (séance 6) : import TypeBadge from "../../components/TypeBadge";
@@ -57,6 +59,8 @@ export default function FichePokemon() {
   // projet : la catégorie (ex : « Pokémon Souris ») et la description du jeu
   const [categorie, setCategorie] = useState("");
   const [description, setDescription] = useState("");
+  // projet : la liste des évolutions, { number, name } comme dans la liste
+  const [evolutions, setEvolutions] = useState([]);
 
   async function charger() {
     const reponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${number}`);
@@ -85,6 +89,29 @@ export default function FichePokemon() {
       // le texte du jeu contient des retours à la ligne, on les remplace par des espaces
       setDescription(texte.flavor_text.replaceAll("\n", " ").replaceAll("\f", " "));
     }
+
+    // projet : la chaîne d'évolution, à une autre adresse donnée par l'espèce
+    const reponseEvo = await fetch(dataFr.evolution_chain.url);
+    const dataEvo = await reponseEvo.json();
+
+    // la chaîne est rangée par étages : le premier Pokémon,
+    // puis dans evolves_to ses évolutions, puis leurs évolutions...
+    // on lit un étage, puis on passe à l'étage suivant
+    const liste = [];
+    let etage = [dataEvo.chain];
+    while (etage.length > 0) {
+      let suivant = [];
+      for (const e of etage) {
+        // pour chaque Pokémon on va chercher son nom français
+        const reponseEspece = await fetch(e.species.url);
+        const espece = await reponseEspece.json();
+        const nomEspece = espece.names.find((n) => n.language.name === "fr");
+        liste.push({ number: espece.id, name: nomEspece ? nomEspece.name : espece.name });
+        suivant = [...suivant, ...e.evolves_to];
+      }
+      etage = suivant;
+    }
+    setEvolutions(liste);
   }
 
   useEffect(() => {
@@ -180,6 +207,26 @@ export default function FichePokemon() {
             </View>
           ))}
         </View>
+
+        {/* projet : les évolutions, seulement si le Pokémon en a */}
+        {evolutions.length > 1 && (
+          <View style={styles.bloc}>
+            <Text style={styles.titreBloc}>Évolutions</Text>
+            <View style={styles.evolutions}>
+              {evolutions.map((e) => (
+                <Pressable
+                  key={e.number}
+                  // le Pokémon de la fiche est entouré de sa couleur
+                  style={[styles.evolution, e.number === pokemon.id && { borderColor: color }]}
+                  onPress={() => router.push(`/pokemon/${e.number}`)}
+                >
+                  <Image source={{ uri: `${ARTWORK}${e.number}.png` }} style={styles.evolutionImage} />
+                  <Text style={styles.evolutionNom}>{e.name}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        )}
       </View>
     </ScrollView>
   );
@@ -214,4 +261,8 @@ const styles = StyleSheet.create({
   statValeur: { width: 36, fontSize: 14, fontWeight: "bold", color: "#111827" },
   barreFond: { flex: 1, height: 10, backgroundColor: "#e5e7eb", borderRadius: 5 },
   barre: { height: 10, borderRadius: 5 },
+  evolutions: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 10 },
+  evolution: { alignItems: "center", padding: 8, borderRadius: 14, borderWidth: 3, borderColor: "#f3f4f6", backgroundColor: "#f3f4f6" },
+  evolutionImage: { width: 80, height: 80 },
+  evolutionNom: { fontSize: 13, fontWeight: "bold", color: "#111827" },
 });
