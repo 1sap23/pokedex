@@ -3,15 +3,20 @@ import { useState, useEffect } from "react";
 import { router } from "expo-router";
 // ANCIEN (séance 3) : import { ScrollView, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
 // ANCIEN (séance 4 et 5) : import { FlatList, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
-import { FlatList, ActivityIndicator, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
-import Titre from "../../components/Titre";
+// ANCIEN (séance 6) : import { FlatList, ActivityIndicator, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
+import { FlatList, ScrollView, ActivityIndicator, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
+// ANCIEN (séance 2 à 6) : import Titre from "../../components/Titre";
+import EntetePokeball from "../../components/EntetePokeball";
 import PokemonCard from "../../components/PokemonCard";
 import Aide from "../../components/Aide";
+import REGIONS from "../../data/regions";
 // ANCIEN (séance 4 et 5) : les 100 Pokémon écrits à la main, remplacés par la PokéAPI
 // import POKEMONS from "../../data/pokemons";
 
 // séance 6 : l'adresse de la PokéAPI pour les 151 premiers Pokémon
-const API = "https://pokeapi.co/api/v2/pokemon?limit=151";
+// const API = "https://pokeapi.co/api/v2/pokemon?limit=151";
+// projet : l'adresse change selon la région, on la construit dans charger()
+const API = "https://pokeapi.co/api/v2/pokemon";
 
 // ANCIEN (séance 2 et 3) : remplacé par src/data/pokemons.js
 // const POKEMONS = [
@@ -32,24 +37,35 @@ export default function Index() {
   const [capturesSeulement, setCapturesSeulement] = useState(false);
   const [captured, setCaptured] = useState([]); // les numéros capturés
   const [search, setSearch] = useState("");
+  const [region, setRegion] = useState(REGIONS[0]); // Kanto au départ
 
   // séance 6 : on va chercher la liste sur Internet
   async function charger() {
-    const reponse = await fetch(API);
+    // const reponse = await fetch(API);
+    // offset : combien on en saute, limit : combien on en prend
+    const offset = region.debut - 1;
+    const limit = region.fin - region.debut + 1;
+    const reponse = await fetch(`${API}?offset=${offset}&limit=${limit}`);
     const data = await reponse.json();
     // const liste = data.results.map((p, i) => ({ number: i + 1, name: p.name }));
     // bonus : la première lettre du nom en majuscule
     const liste = data.results.map((p, i) => ({
-      number: i + 1,
+      // number: i + 1,
+      number: region.debut + i, // le premier de la région n'est pas forcément le n°1
       name: p.name[0].toUpperCase() + p.name.slice(1),
     }));
     setPokemons(liste);
   }
 
-  // [] : on charge une seule fois, quand l'écran s'ouvre
+  // ANCIEN (séance 6) : [] : on charge une seule fois, quand l'écran s'ouvre
+  // useEffect(() => {
+  //   charger();
+  // }, []);
+  // projet : [region] : on recharge à chaque fois qu'on change de région
   useEffect(() => {
+    setPokemons(null); // on remet le rond qui tourne
     charger();
-  }, []);
+  }, [region]);
 
   // tant que la liste n'est pas arrivée, on affiche le rond qui tourne
   if (pokemons === null) {
@@ -165,7 +181,24 @@ export default function Index() {
       ListHeaderComponent={
         <View>
           {/* <Titre texte="Mon Pokédex" sousTitre={`${POKEMONS.length} Pokémon`} /> */}
-          <Titre texte="Mon Pokédex" sousTitre={`${pokemons.length} Pokémon`} />
+          {/* <Titre texte="Mon Pokédex" sousTitre={`${pokemons.length} Pokémon`} /> */}
+          {/* <EntetePokeball titre="Mon Pokédex" sousTitre={`${pokemons.length} Pokémon`} /> */}
+          <EntetePokeball titre="Mon Pokédex" sousTitre={`${region.nom} · ${pokemons.length} Pokémon`} />
+
+          {/* projet : un bouton par région, on peut faire défiler sur le côté */}
+          <ScrollView horizontal style={styles.regions}>
+            {REGIONS.map((r) => (
+              <Pressable
+                key={r.nom}
+                style={[styles.region, r.nom === region.nom && styles.regionChoisie]}
+                onPress={() => setRegion(r)}
+              >
+                <Text style={[styles.regionTexte, r.nom === region.nom && styles.regionTexteChoisi]}>
+                  {r.nom}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
           <Text style={styles.captures}>{captured.length} Pokémon capturés</Text>
 
           <Aide />
@@ -234,6 +267,11 @@ const styles = StyleSheet.create({
   contenu: { padding: 20 },
   ligne: { gap: 10 }, // espace entre les 2 colonnes
   carte: { flex: 1 }, // le Pressable prend la moitié de la ligne, comme la carte
+  regions: { marginBottom: 16 },
+  region: { borderWidth: 2, borderColor: "#e3350d", borderRadius: 20, paddingVertical: 6, paddingHorizontal: 14, marginRight: 8 },
+  regionChoisie: { backgroundColor: "#e3350d" },
+  regionTexte: { color: "#e3350d", fontWeight: "bold" },
+  regionTexteChoisi: { color: "#ffffff" },
   captures: { fontSize: 15, fontWeight: "bold", color: "#16a34a", marginBottom: 16 },
   sac: { alignItems: "center", marginBottom: 20 },
   balls: { fontSize: 22, fontWeight: "bold", color: "#111827" },

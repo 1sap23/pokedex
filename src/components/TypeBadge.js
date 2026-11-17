@@ -18,6 +18,10 @@ export const TYPE_COLORS = {
   // séance 6 : la fiche va jusqu'au n°151
   Glace: "#98D8D8",
   Dragon: "#7038F8",
+  // projet : les types des autres régions
+  Acier: "#B8B8D0",
+  Ténèbres: "#705848",
+  Vol: "#A890F0",
 };
 
 export default function TypeBadge({ type }) {

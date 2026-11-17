@@ -3,7 +3,15 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function TabsLayout() {
   return (
-    <Tabs>
+    // ANCIEN (séance 5) : <Tabs>
+    // le haut en rouge Poké Ball et l'onglet choisi en rouge
+    <Tabs
+      screenOptions={{
+        headerStyle: { backgroundColor: "#e3350d" },
+        headerTintColor: "#ffffff",
+        tabBarActiveTintColor: "#e3350d",
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
