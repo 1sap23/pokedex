@@ -1,6 +1,7 @@
 // ANCIEN (séance 3 à 5) : import { useState } from "react";
 import { useState, useEffect } from "react";
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 // ANCIEN (séance 3) : import { ScrollView, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
 // ANCIEN (séance 4 et 5) : import { FlatList, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
 // ANCIEN (séance 6) : import { FlatList, ActivityIndicator, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
@@ -38,6 +39,8 @@ export default function Index() {
   const [captured, setCaptured] = useState([]); // les numéros capturés
   const [search, setSearch] = useState("");
   const [region, setRegion] = useState(REGIONS[0]); // Kanto au départ
+  // phase 1 : le tri, "numero" ou "nom"
+  const [tri, setTri] = useState("numero");
 
   // séance 6 : on va chercher la liste sur Internet
   async function charger() {
@@ -92,6 +95,13 @@ export default function Index() {
   const visibles = parType.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  // phase 1 : on trie une copie ([...]) pour ne pas abîmer la liste d'origine
+  // localeCompare compare deux textes dans l'ordre alphabétique
+  const tries =
+    tri === "nom"
+      ? [...visibles].sort((a, b) => a.name.localeCompare(b.name))
+      : visibles;
 
   // capturer ou relâcher un Pokémon
   function toggle(number) {
@@ -173,7 +183,8 @@ export default function Index() {
     <FlatList
       style={styles.page}
       contentContainerStyle={styles.contenu}
-      data={visibles}
+      // data={visibles}
+      data={tries}
       extraData={captured} // redessiner les cartes quand captured change
       keyExtractor={(item) => String(item.number)}
       numColumns={2}
@@ -183,7 +194,8 @@ export default function Index() {
           {/* <Titre texte="Mon Pokédex" sousTitre={`${POKEMONS.length} Pokémon`} /> */}
           {/* <Titre texte="Mon Pokédex" sousTitre={`${pokemons.length} Pokémon`} /> */}
           {/* <EntetePokeball titre="Mon Pokédex" sousTitre={`${pokemons.length} Pokémon`} /> */}
-          <EntetePokeball titre="Mon Pokédex" sousTitre={`${region.nom} · ${pokemons.length} Pokémon`} />
+          {/* <EntetePokeball titre="Mon Pokédex" sousTitre={`${region.nom} · ${pokemons.length} Pokémon`} /> */}
+          <EntetePokeball titre="Mon Pokédex" sousTitre={`Pokédex de ${region.nom}`} />
 
           {/* projet : un bouton par région, on peut faire défiler sur le côté */}
           <ScrollView horizontal style={styles.regions}>
@@ -199,13 +211,11 @@ export default function Index() {
               </Pressable>
             ))}
           </ScrollView>
+          {/* ANCIEN (séance 3 à 6) : compteur, aide, sac et recherche les uns sous les autres
           <Text style={styles.captures}>{captured.length} Pokémon capturés</Text>
-
           <Aide />
-
           <View style={styles.sac}>
             <Text style={styles.balls}>Poké Balls : {balls}</Text>
-
             <View style={styles.boutons}>
               <Pressable style={styles.bouton} onPress={enlever}>
                 <Text style={styles.boutonTexte}>-</Text>
@@ -214,18 +224,56 @@ export default function Index() {
                 <Text style={styles.boutonTexte}>+</Text>
               </Pressable>
             </View>
-
             <Pressable style={styles.vider} onPress={() => setBalls(0)}>
               <Text style={styles.viderTexte}>Vider le sac</Text>
             </Pressable>
           </View>
-
           <TextInput
             style={styles.recherche}
             placeholder="Rechercher un Pokémon"
             value={search}
             onChangeText={setSearch}
           />
+          */}
+
+          {/* phase 1 : trois petites cartes côte à côte */}
+          <View style={styles.statsLigne}>
+            <View style={styles.statCarte}>
+              <Text style={styles.statNombre}>{pokemons.length}</Text>
+              <Text style={styles.statTexte}>Pokémon</Text>
+            </View>
+            <View style={styles.statCarte}>
+              <Text style={[styles.statNombre, { color: "#16a34a" }]}>{captured.length}</Text>
+              <Text style={styles.statTexte}>capturés</Text>
+            </View>
+            {/* le sac de Poké Balls, avec des petits boutons - et + */}
+            <View style={styles.statCarte}>
+              <View style={styles.sacLigne}>
+                <Pressable style={styles.petitBouton} onPress={enlever}>
+                  <Text style={styles.petitBoutonTexte}>-</Text>
+                </Pressable>
+                <Text style={styles.statNombre}>{balls}</Text>
+                <Pressable style={styles.petitBouton} onPress={ajouter}>
+                  <Text style={styles.petitBoutonTexte}>+</Text>
+                </Pressable>
+              </View>
+              {/* un appui long sur « Poké Balls » vide le sac */}
+              <Pressable onLongPress={() => setBalls(0)}>
+                <Text style={styles.statTexte}>Poké Balls</Text>
+              </Pressable>
+            </View>
+          </View>
+
+          {/* la barre de recherche avec une loupe */}
+          <View style={styles.rechercheLigne}>
+            <Ionicons name="search" size={18} color="#9ca3af" />
+            <TextInput
+              style={styles.rechercheChamp}
+              placeholder="Rechercher un Pokémon"
+              value={search}
+              onChangeText={setSearch}
+            />
+          </View>
 
           {/* ANCIEN (séance 3) : le bouton du filtre Feu
           <Pressable style={styles.filtre} onPress={() => setFeuSeulement(!feuSeulement)}>
@@ -234,11 +282,38 @@ export default function Index() {
             </Text>
           </Pressable>
           */}
+          {/* ANCIEN (séance 4 à 6) :
           <Pressable style={styles.filtre} onPress={() => setCapturesSeulement(!capturesSeulement)}>
             <Text style={styles.viderTexte}>
               {capturesSeulement ? "Tout afficher" : "Mes captures"}
             </Text>
           </Pressable>
+          */}
+          {/* phase 1 : les filtres et le tri sur une seule ligne */}
+          <View style={styles.filtresLigne}>
+            <Pressable
+              style={[styles.puce, capturesSeulement && styles.puceChoisie]}
+              onPress={() => setCapturesSeulement(!capturesSeulement)}
+            >
+              <Text style={[styles.puceTexte, capturesSeulement && styles.puceTexteChoisi]}>
+                Mes captures
+              </Text>
+            </Pressable>
+            <Pressable
+              style={[styles.puce, tri === "numero" && styles.puceChoisie]}
+              onPress={() => setTri("numero")}
+            >
+              <Text style={[styles.puceTexte, tri === "numero" && styles.puceTexteChoisi]}>N°</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.puce, tri === "nom" && styles.puceChoisie]}
+              onPress={() => setTri("nom")}
+            >
+              <Text style={[styles.puceTexte, tri === "nom" && styles.puceTexteChoisi]}>A → Z</Text>
+            </Pressable>
+          </View>
+
+          <Aide />
 
           {visibles.length === 0 && <Text>Aucun Pokémon trouvé</Text>}
         </View>
@@ -267,11 +342,28 @@ const styles = StyleSheet.create({
   contenu: { padding: 20 },
   ligne: { gap: 10 }, // espace entre les 2 colonnes
   carte: { flex: 1 }, // le Pressable prend la moitié de la ligne, comme la carte
-  regions: { marginBottom: 16 },
-  region: { borderWidth: 2, borderColor: "#e3350d", borderRadius: 20, paddingVertical: 6, paddingHorizontal: 14, marginRight: 8 },
+  // regions: { marginBottom: 16 },
+  // region: { borderWidth: 2, borderColor: "#e3350d", borderRadius: 20, paddingVertical: 6, paddingHorizontal: 14, marginRight: 8 },
+  regions: { marginBottom: 12 },
+  region: { borderWidth: 2, borderColor: "#e3350d", borderRadius: 20, paddingVertical: 4, paddingHorizontal: 12, marginRight: 8 },
   regionChoisie: { backgroundColor: "#e3350d" },
   regionTexte: { color: "#e3350d", fontWeight: "bold" },
   regionTexteChoisi: { color: "#ffffff" },
+  // phase 1 : les petites cartes, la recherche et les filtres
+  statsLigne: { flexDirection: "row", gap: 8, marginBottom: 12 },
+  statCarte: { flex: 1, backgroundColor: "#ffffff", borderRadius: 14, paddingVertical: 10, alignItems: "center" },
+  statNombre: { fontSize: 20, fontWeight: "bold", color: "#111827" },
+  statTexte: { fontSize: 12, color: "#6b7280" },
+  sacLigne: { flexDirection: "row", alignItems: "center", gap: 8 },
+  petitBouton: { backgroundColor: "#2f5be7", width: 22, height: 22, borderRadius: 11, justifyContent: "center", alignItems: "center" },
+  petitBoutonTexte: { color: "#ffffff", fontWeight: "bold" },
+  rechercheLigne: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: "#ffffff", borderRadius: 12, paddingHorizontal: 12, marginBottom: 10 },
+  rechercheChamp: { flex: 1, paddingVertical: 10 },
+  filtresLigne: { flexDirection: "row", gap: 8, marginBottom: 4 },
+  puce: { borderWidth: 2, borderColor: "#2f5be7", borderRadius: 20, paddingVertical: 4, paddingHorizontal: 12 },
+  puceChoisie: { backgroundColor: "#2f5be7" },
+  puceTexte: { color: "#2f5be7", fontWeight: "bold" },
+  puceTexteChoisi: { color: "#ffffff" },
   captures: { fontSize: 15, fontWeight: "bold", color: "#16a34a", marginBottom: 16 },
   sac: { alignItems: "center", marginBottom: 20 },
   balls: { fontSize: 22, fontWeight: "bold", color: "#111827" },

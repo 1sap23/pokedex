@@ -9,6 +9,7 @@ import { Stack, router, useLocalSearchParams } from "expo-router";
 // import POKEMONS from "../../data/pokemons";
 // ANCIEN (séance 6) : import TypeBadge from "../../components/TypeBadge";
 import TypeBadge, { TYPE_COLORS } from "../../components/TypeBadge";
+import { Ionicons } from "@expo/vector-icons";
 
 const ARTWORK =
   "https://raw.githubusercontent.com/PokeAPI/sprites" +
@@ -61,6 +62,10 @@ export default function FichePokemon() {
   const [description, setDescription] = useState("");
   // projet : la liste des évolutions, { number, name } comme dans la liste
   const [evolutions, setEvolutions] = useState([]);
+  // phase 1 : les talents, l'onglet affiché et la version Shiny
+  const [talents, setTalents] = useState([]);
+  const [onglet, setOnglet] = useState("apropos");
+  const [shiny, setShiny] = useState(false);
 
   async function charger() {
     const reponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${number}`);
@@ -90,6 +95,19 @@ export default function FichePokemon() {
       setDescription(texte.flavor_text.replaceAll("\n", " ").replaceAll("\f", " "));
     }
 
+    // phase 1 : les talents, chacun a son adresse avec le nom français
+    const listeTalents = [];
+    for (const a of data.abilities) {
+      const reponseTalent = await fetch(a.ability.url);
+      const talent = await reponseTalent.json();
+      const nomTalent = talent.names.find((n) => n.language.name === "fr");
+      listeTalents.push({
+        nom: nomTalent ? nomTalent.name : a.ability.name,
+        cache: a.is_hidden, // true si c'est le talent caché
+      });
+    }
+    setTalents(listeTalents);
+
     // projet : la chaîne d'évolution, à une autre adresse donnée par l'espèce
     const reponseEvo = await fetch(dataFr.evolution_chain.url);
     const dataEvo = await reponseEvo.json();
@@ -106,12 +124,44 @@ export default function FichePokemon() {
         const reponseEspece = await fetch(e.species.url);
         const espece = await reponseEspece.json();
         const nomEspece = espece.names.find((n) => n.language.name === "fr");
-        liste.push({ number: espece.id, name: nomEspece ? nomEspece.name : espece.name });
+        // liste.push({ number: espece.id, name: nomEspece ? nomEspece.name : espece.name });
+        // phase 1 : on ajoute comment on obtient ce Pokémon
+        const condition = await texteCondition(e.evolution_details[0]);
+        liste.push({
+          number: espece.id,
+          name: nomEspece ? nomEspece.name : espece.name,
+          condition: condition,
+        });
         suivant = [...suivant, ...e.evolves_to];
       }
       etage = suivant;
     }
     setEvolutions(liste);
+  }
+
+  // phase 1 : transforme les détails d'une évolution en petit texte
+  // le premier Pokémon de la chaîne n'a pas de détails : texte vide
+  async function texteCondition(details) {
+    if (!details) {
+      return "";
+    }
+    if (details.min_level) {
+      return `Niveau ${details.min_level}`;
+    }
+    if (details.item) {
+      // l'objet a lui aussi son adresse avec le nom français (ex : Pierre Feu)
+      const reponseObjet = await fetch(details.item.url);
+      const objet = await reponseObjet.json();
+      const nomObjet = objet.names.find((n) => n.language.name === "fr");
+      return nomObjet ? nomObjet.name : details.item.name;
+    }
+    if (details.trigger.name === "trade") {
+      return "Échange";
+    }
+    if (details.min_happiness) {
+      return "Bonheur";
+    }
+    return "Spécial";
   }
 
   useEffect(() => {
@@ -131,6 +181,12 @@ export default function FichePokemon() {
   const type = pokemon.types[0].type.name;
   // projet : la couleur du premier type, pour le bandeau et les barres
   const color = TYPE_COLORS[TYPES_FR[type]] || "#9ca3af";
+
+  // phase 1 : le total des statistiques, on additionne les 6 valeurs
+  let total = 0;
+  for (const s of pokemon.stats) {
+    total = total + s.base_stat;
+  }
 
   // ANCIEN (séance 6) : la fiche simple
   // return (
@@ -157,7 +213,16 @@ export default function FichePokemon() {
       {/* le bandeau de couleur avec le numéro et l'image */}
       <View style={[styles.bandeau, { backgroundColor: color }]}>
         <Text style={styles.numero}>#{pokemon.id}</Text>
-        <Image source={{ uri: `${ARTWORK}${pokemon.id}.png` }} style={styles.image} />
+        {/* <Image source={{ uri: `${ARTWORK}${pokemon.id}.png` }} style={styles.image} /> */}
+        {/* phase 1 : les images Shiny sont dans le dossier shiny/ */}
+        <Image
+          source={{ uri: `${ARTWORK}${shiny ? "shiny/" : ""}${pokemon.id}.png` }}
+          style={styles.image}
+        />
+        <Pressable style={styles.boutonShiny} onPress={() => setShiny(!shiny)}>
+          <Ionicons name="sparkles" size={16} color={shiny ? "#facc15" : "#ffffff"} />
+          <Text style={styles.boutonShinyTexte}>{shiny ? "Normal" : "Shiny"}</Text>
+        </Pressable>
       </View>
 
       <View style={styles.contenu}>
@@ -171,6 +236,37 @@ export default function FichePokemon() {
           ))}
         </View>
 
+        {/* phase 1 : les onglets de la fiche */}
+        <View style={styles.onglets}>
+          <Pressable
+            style={[styles.onglet, onglet === "apropos" && { backgroundColor: color }]}
+            onPress={() => setOnglet("apropos")}
+          >
+            <Text style={[styles.ongletTexte, onglet === "apropos" && styles.ongletTexteChoisi]}>
+              À propos
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.onglet, onglet === "stats" && { backgroundColor: color }]}
+            onPress={() => setOnglet("stats")}
+          >
+            <Text style={[styles.ongletTexte, onglet === "stats" && styles.ongletTexteChoisi]}>
+              Stats
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.onglet, onglet === "evolutions" && { backgroundColor: color }]}
+            onPress={() => setOnglet("evolutions")}
+          >
+            <Text style={[styles.ongletTexte, onglet === "evolutions" && styles.ongletTexteChoisi]}>
+              Évolutions
+            </Text>
+          </Pressable>
+        </View>
+
+        {/* ===== onglet À propos ===== */}
+        {onglet === "apropos" && (
+        <View>
         {description !== "" && (
           <View style={styles.bloc}>
             <Text style={styles.description}>{description}</Text>
@@ -188,6 +284,21 @@ export default function FichePokemon() {
           </View>
         </View>
 
+        {/* phase 1 : les talents, le talent caché est signalé */}
+        <View style={styles.bloc}>
+          <Text style={styles.titreBloc}>Talents</Text>
+          {talents.map((t) => (
+            <View key={t.nom} style={styles.talent}>
+              <Text style={styles.talentNom}>{t.nom}</Text>
+              {t.cache && <Text style={[styles.talentCache, { color: color }]}>caché</Text>}
+            </View>
+          ))}
+        </View>
+        </View>
+        )}
+
+        {/* ===== onglet Stats ===== */}
+        {onglet === "stats" && (
         <View style={styles.bloc}>
           <Text style={styles.titreBloc}>Statistiques</Text>
           {pokemon.stats.map((s) => (
@@ -206,10 +317,24 @@ export default function FichePokemon() {
               </View>
             </View>
           ))}
+          {/* phase 1 : le total */}
+          <View style={styles.stat}>
+            <Text style={[styles.statNom, styles.totalTexte]}>Total</Text>
+            <Text style={[styles.statValeur, styles.totalTexte]}>{total}</Text>
+          </View>
         </View>
+        )}
+
+        {/* ===== onglet Évolutions ===== */}
+        {onglet === "evolutions" && evolutions.length <= 1 && (
+          <View style={styles.bloc}>
+            <Text style={styles.description}>Ce Pokémon n'évolue pas.</Text>
+          </View>
+        )}
 
         {/* projet : les évolutions, seulement si le Pokémon en a */}
-        {evolutions.length > 1 && (
+        {/* {evolutions.length > 1 && ( */}
+        {onglet === "evolutions" && evolutions.length > 1 && (
           <View style={styles.bloc}>
             <Text style={styles.titreBloc}>Évolutions</Text>
             <View style={styles.evolutions}>
@@ -222,6 +347,10 @@ export default function FichePokemon() {
                 >
                   <Image source={{ uri: `${ARTWORK}${e.number}.png` }} style={styles.evolutionImage} />
                   <Text style={styles.evolutionNom}>{e.name}</Text>
+                  {/* phase 1 : comment on l'obtient */}
+                  {e.condition !== "" && (
+                    <Text style={styles.evolutionCondition}>{e.condition}</Text>
+                  )}
                 </Pressable>
               ))}
             </View>
@@ -265,4 +394,16 @@ const styles = StyleSheet.create({
   evolution: { alignItems: "center", padding: 8, borderRadius: 14, borderWidth: 3, borderColor: "#f3f4f6", backgroundColor: "#f3f4f6" },
   evolutionImage: { width: 80, height: 80 },
   evolutionNom: { fontSize: 13, fontWeight: "bold", color: "#111827" },
+  // phase 1
+  evolutionCondition: { fontSize: 11, color: "#6b7280", marginTop: 2 },
+  boutonShiny: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(0,0,0,0.25)", borderRadius: 20, paddingVertical: 6, paddingHorizontal: 14 },
+  boutonShinyTexte: { color: "#ffffff", fontWeight: "bold" },
+  onglets: { flexDirection: "row", backgroundColor: "#e5e7eb", borderRadius: 14, padding: 4, marginBottom: 16 },
+  onglet: { flex: 1, paddingVertical: 8, borderRadius: 10, alignItems: "center" },
+  ongletTexte: { fontWeight: "bold", color: "#6b7280" },
+  ongletTexteChoisi: { color: "#ffffff" },
+  talent: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 6 },
+  talentNom: { fontSize: 16, color: "#111827" },
+  talentCache: { fontSize: 12, fontWeight: "bold" },
+  totalTexte: { fontWeight: "bold", color: "#111827" },
 });

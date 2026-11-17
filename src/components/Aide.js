@@ -23,8 +23,13 @@ export default function Aide() {
 }
 
 const styles = StyleSheet.create({
-  bloc: { alignItems: "center", marginBottom: 20 },
-  bouton: { borderWidth: 2, borderColor: "#2f5be7", borderRadius: 10, paddingVertical: 8, paddingHorizontal: 16 },
-  boutonTexte: { color: "#2f5be7", fontWeight: "bold" },
+  // ANCIEN (séance 3) : un gros bouton bleu
+  // bloc: { alignItems: "center", marginBottom: 20 },
+  // bouton: { borderWidth: 2, borderColor: "#2f5be7", borderRadius: 10, paddingVertical: 8, paddingHorizontal: 16 },
+  // boutonTexte: { color: "#2f5be7", fontWeight: "bold" },
+  // phase 1 : un simple lien, plus discret
+  bloc: { alignItems: "center", marginBottom: 12 },
+  bouton: { paddingVertical: 4 },
+  boutonTexte: { color: "#2f5be7", fontWeight: "bold", textDecorationLine: "underline" },
   texte: { marginTop: 10, color: "#6b7280", textAlign: "center" },
 });

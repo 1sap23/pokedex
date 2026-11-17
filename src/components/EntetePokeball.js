@@ -21,13 +21,19 @@ export default function EntetePokeball({ titre, sousTitre }) {
 }
 
 const styles = StyleSheet.create({
-  boule: { borderRadius: 24, borderWidth: 4, borderColor: "#111827", overflow: "hidden", marginBottom: 16 },
-  haut: { backgroundColor: "#e3350d", paddingTop: 24, paddingBottom: 28, alignItems: "center" },
-  titre: { fontSize: 32, fontWeight: "bold", color: "#ffffff" },
+  // ANCIEN (étape 1) : l'en-tête prenait trop de place sur l'accueil
+  // boule: { borderRadius: 24, borderWidth: 4, borderColor: "#111827", overflow: "hidden", marginBottom: 16 },
+  // haut: { backgroundColor: "#e3350d", paddingTop: 24, paddingBottom: 28, alignItems: "center" },
+  // titre: { fontSize: 32, fontWeight: "bold", color: "#ffffff" },
+  // bas: { backgroundColor: "#ffffff", paddingTop: 28, paddingBottom: 16, alignItems: "center" },
+  // phase 1 : la même Poké Ball, en plus petit
+  boule: { borderRadius: 20, borderWidth: 3, borderColor: "#111827", overflow: "hidden", marginBottom: 12 },
+  haut: { backgroundColor: "#e3350d", paddingTop: 12, paddingBottom: 16, alignItems: "center" },
+  titre: { fontSize: 24, fontWeight: "bold", color: "#ffffff" },
   // la bande noire, le bouton blanc est centré dessus
   // zIndex : la bande passe devant le bas, sinon le bouton serait coupé
   bande: { height: 10, backgroundColor: "#111827", justifyContent: "center", alignItems: "center", zIndex: 1 },
-  bouton: { width: 44, height: 44, borderRadius: 22, backgroundColor: "#ffffff", borderWidth: 6, borderColor: "#111827" },
-  bas: { backgroundColor: "#ffffff", paddingTop: 28, paddingBottom: 16, alignItems: "center" },
+  bouton: { width: 32, height: 32, borderRadius: 16, backgroundColor: "#ffffff", borderWidth: 5, borderColor: "#111827" },
+  bas: { backgroundColor: "#ffffff", paddingTop: 18, paddingBottom: 8, alignItems: "center" },
   sousTitre: { fontSize: 16, color: "#6b7280", fontWeight: "bold" },
 });
