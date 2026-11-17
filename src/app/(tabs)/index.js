@@ -11,6 +11,7 @@ import EntetePokeball from "../../components/EntetePokeball";
 import PokemonCard from "../../components/PokemonCard";
 import Aide from "../../components/Aide";
 import REGIONS from "../../data/regions";
+import { useCollection } from "../../context/Collection";
 // ANCIEN (séance 4 et 5) : les 100 Pokémon écrits à la main, remplacés par la PokéAPI
 // import POKEMONS from "../../data/pokemons";
 
@@ -36,7 +37,10 @@ export default function Index() {
   // ANCIEN (séance 3) : le filtre Feu, remplacé par « Mes captures »
   // const [feuSeulement, setFeuSeulement] = useState(false);
   const [capturesSeulement, setCapturesSeulement] = useState(false);
-  const [captured, setCaptured] = useState([]); // les numéros capturés
+  // ANCIEN (séance 3 à phase 2) : les captures n'existaient que sur cet écran
+  // const [captured, setCaptured] = useState([]); // les numéros capturés
+  // phase 3 : elles viennent du Context, partagées et sauvegardées
+  const { captured, toggleCapture } = useCollection();
   const [search, setSearch] = useState("");
   const [region, setRegion] = useState(REGIONS[0]); // Kanto au départ
   // phase 1 : le tri, "numero" ou "nom"
@@ -104,13 +108,14 @@ export default function Index() {
       : visibles;
 
   // capturer ou relâcher un Pokémon
-  function toggle(number) {
-    if (captured.includes(number)) {
-      setCaptured(captured.filter((n) => n !== number));
-    } else {
-      setCaptured([...captured, number]);
-    }
-  }
+  // ANCIEN (séance 3 à phase 2) : déplacé dans src/context/Collection.js
+  // function toggle(number) {
+  //   if (captured.includes(number)) {
+  //     setCaptured(captured.filter((n) => n !== number));
+  //   } else {
+  //     setCaptured([...captured, number]);
+  //   }
+  // }
 
   function ajouter() {
     // on ne monte jamais au-dessus de 10
@@ -328,7 +333,8 @@ export default function Index() {
             name={item.name}
             type={item.type}
             captured={captured.includes(item.number)}
-            onToggle={() => toggle(item.number)}
+            // onToggle={() => toggle(item.number)}
+            onToggle={() => toggleCapture(item.number)}
           />
         </Pressable>
       )}

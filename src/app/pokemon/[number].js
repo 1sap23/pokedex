@@ -11,6 +11,7 @@ import { Stack, router, useLocalSearchParams } from "expo-router";
 import TypeBadge, { TYPE_COLORS } from "../../components/TypeBadge";
 import { Ionicons } from "@expo/vector-icons";
 import Faiblesses from "../../components/Faiblesses";
+import { useCollection } from "../../context/Collection";
 
 const ARTWORK =
   "https://raw.githubusercontent.com/PokeAPI/sprites" +
@@ -67,6 +68,8 @@ export default function FichePokemon() {
   const [talents, setTalents] = useState([]);
   const [onglet, setOnglet] = useState("apropos");
   const [shiny, setShiny] = useState(false);
+  // phase 3 : favoris et équipe, partagés avec les onglets
+  const { estFavori, toggleFavori, estDansEquipe, toggleEquipe, equipe } = useCollection();
 
   async function charger() {
     const reponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${number}`);
@@ -183,6 +186,15 @@ export default function FichePokemon() {
   // projet : la couleur du premier type, pour le bandeau et les barres
   const color = TYPE_COLORS[TYPES_FR[type]] || "#9ca3af";
 
+  // phase 3 : ce qu'on garde dans les favoris et l'équipe
+  const resume = {
+    number: pokemon.id,
+    name: nom,
+    types: pokemon.types.map((t) => TYPES_FR[t.type.name] || t.type.name),
+  };
+  const favori = estFavori(pokemon.id);
+  const dansEquipe = estDansEquipe(pokemon.id);
+
   // phase 1 : le total des statistiques, on additionne les 6 valeurs
   let total = 0;
   for (const s of pokemon.stats) {
@@ -220,10 +232,25 @@ export default function FichePokemon() {
           source={{ uri: `${ARTWORK}${shiny ? "shiny/" : ""}${pokemon.id}.png` }}
           style={styles.image}
         />
-        <Pressable style={styles.boutonShiny} onPress={() => setShiny(!shiny)}>
-          <Ionicons name="sparkles" size={16} color={shiny ? "#facc15" : "#ffffff"} />
-          <Text style={styles.boutonShinyTexte}>{shiny ? "Normal" : "Shiny"}</Text>
-        </Pressable>
+        {/* phase 3 : les trois boutons sont sur une ligne */}
+        <View style={styles.boutonsBandeau}>
+          <Pressable style={styles.boutonShiny} onPress={() => setShiny(!shiny)}>
+            <Ionicons name="sparkles" size={16} color={shiny ? "#facc15" : "#ffffff"} />
+            <Text style={styles.boutonShinyTexte}>{shiny ? "Normal" : "Shiny"}</Text>
+          </Pressable>
+          <Pressable style={styles.boutonShiny} onPress={() => toggleFavori(resume)}>
+            {/* coeur plein si favori, coeur vide sinon */}
+            <Ionicons name={favori ? "heart" : "heart-outline"} size={16} color="#ffffff" />
+            <Text style={styles.boutonShinyTexte}>Favori</Text>
+          </Pressable>
+          <Pressable style={styles.boutonShiny} onPress={() => toggleEquipe(resume)}>
+            <Ionicons name={dansEquipe ? "people" : "people-outline"} size={16} color="#ffffff" />
+            <Text style={styles.boutonShinyTexte}>
+              {/* si l'équipe est pleine, on le dit */}
+              {dansEquipe ? "Dans l'équipe" : equipe.length < 6 ? "Équipe" : "Équipe pleine"}
+            </Text>
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.contenu}>
@@ -417,6 +444,7 @@ const styles = StyleSheet.create({
   evolutionCondition: { fontSize: 11, color: "#6b7280", marginTop: 2 },
   boutonShiny: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(0,0,0,0.25)", borderRadius: 20, paddingVertical: 6, paddingHorizontal: 14 },
   boutonShinyTexte: { color: "#ffffff", fontWeight: "bold" },
+  boutonsBandeau: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 8 },
   onglets: { flexDirection: "row", backgroundColor: "#e5e7eb", borderRadius: 14, padding: 4, marginBottom: 16 },
   onglet: { flex: 1, paddingVertical: 8, borderRadius: 10, alignItems: "center" },
   // ongletTexte: { fontWeight: "bold", color: "#6b7280" },

@@ -1,4 +1,5 @@
 import { Stack } from "expo-router";
+import { CollectionProvider } from "../context/Collection";
 
 export default function RootLayout() {
   return (
@@ -9,6 +10,9 @@ export default function RootLayout() {
     // </Stack>
     // ANCIEN (séance 5 et 6) : <Stack>
     // la fiche aussi a le haut en rouge Poké Ball
+    // phase 3 : CollectionProvider entoure toute l'app,
+    // tous les écrans partagent les mêmes captures, favoris et équipe
+    <CollectionProvider>
     <Stack
       screenOptions={{
         headerStyle: { backgroundColor: "#e3350d" },
@@ -17,5 +21,6 @@ export default function RootLayout() {
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
     </Stack>
+    </CollectionProvider>
   );
 }

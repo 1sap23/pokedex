@@ -31,6 +31,25 @@ export default function TabsLayout() {
           ),
         }}
       />
+      {/* phase 3 : l'équipe et les favoris */}
+      <Tabs.Screen
+        name="equipe"
+        options={{
+          title: "Équipe",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="people" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="favoris"
+        options={{
+          title: "Favoris",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="heart" size={size} color={color} />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="profil"
         options={{
