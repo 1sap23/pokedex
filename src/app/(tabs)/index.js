@@ -1,11 +1,17 @@
-import { useState } from "react";
+// ANCIEN (séance 3 à 5) : import { useState } from "react";
+import { useState, useEffect } from "react";
 import { router } from "expo-router";
 // ANCIEN (séance 3) : import { ScrollView, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
-import { FlatList, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
+// ANCIEN (séance 4 et 5) : import { FlatList, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
+import { FlatList, ActivityIndicator, View, Text, Pressable, TextInput, StyleSheet } from "react-native";
 import Titre from "../../components/Titre";
 import PokemonCard from "../../components/PokemonCard";
 import Aide from "../../components/Aide";
-import POKEMONS from "../../data/pokemons"; // séance 4 : les 100 premiers Pokémon
+// ANCIEN (séance 4 et 5) : les 100 Pokémon écrits à la main, remplacés par la PokéAPI
+// import POKEMONS from "../../data/pokemons";
+
+// séance 6 : l'adresse de la PokéAPI pour les 151 premiers Pokémon
+const API = "https://pokeapi.co/api/v2/pokemon?limit=151";
 
 // ANCIEN (séance 2 et 3) : remplacé par src/data/pokemons.js
 // const POKEMONS = [
@@ -18,6 +24,8 @@ import POKEMONS from "../../data/pokemons"; // séance 4 : les 100 premiers Pok�
 // ];
 
 export default function Index() {
+  // null au départ : la liste n'est pas encore arrivée
+  const [pokemons, setPokemons] = useState(null);
   const [balls, setBalls] = useState(0);
   // ANCIEN (séance 3) : le filtre Feu, remplacé par « Mes captures »
   // const [feuSeulement, setFeuSeulement] = useState(false);
@@ -25,13 +33,44 @@ export default function Index() {
   const [captured, setCaptured] = useState([]); // les numéros capturés
   const [search, setSearch] = useState("");
 
+  // séance 6 : on va chercher la liste sur Internet
+  async function charger() {
+    const reponse = await fetch(API);
+    const data = await reponse.json();
+    // const liste = data.results.map((p, i) => ({ number: i + 1, name: p.name }));
+    // bonus : la première lettre du nom en majuscule
+    const liste = data.results.map((p, i) => ({
+      number: i + 1,
+      name: p.name[0].toUpperCase() + p.name.slice(1),
+    }));
+    setPokemons(liste);
+  }
+
+  // [] : on charge une seule fois, quand l'écran s'ouvre
+  useEffect(() => {
+    charger();
+  }, []);
+
+  // tant que la liste n'est pas arrivée, on affiche le rond qui tourne
+  if (pokemons === null) {
+    return (
+      <View style={styles.chargement}>
+        <ActivityIndicator size="large" color="#2f5be7" />
+      </View>
+    );
+  }
+
   // la liste a afficher, recalculee a chaque clic
   // const parType = feuSeulement
   //   ? POKEMONS.filter((p) => p.type === "Feu")
   //   : POKEMONS;
+  // const parType = capturesSeulement
+  //   ? POKEMONS.filter((p) => captured.includes(p.number))
+  //   : POKEMONS;
+  // séance 6 : POKEMONS devient pokemons (la liste de l'API)
   const parType = capturesSeulement
-    ? POKEMONS.filter((p) => captured.includes(p.number))
-    : POKEMONS;
+    ? pokemons.filter((p) => captured.includes(p.number))
+    : pokemons;
 
   // puis on garde seulement les noms qui contiennent la recherche
   const visibles = parType.filter((p) =>
@@ -125,7 +164,8 @@ export default function Index() {
       columnWrapperStyle={styles.ligne}
       ListHeaderComponent={
         <View>
-          <Titre texte="Mon Pokédex" sousTitre={`${POKEMONS.length} Pokémon`} />
+          {/* <Titre texte="Mon Pokédex" sousTitre={`${POKEMONS.length} Pokémon`} /> */}
+          <Titre texte="Mon Pokédex" sousTitre={`${pokemons.length} Pokémon`} />
           <Text style={styles.captures}>{captured.length} Pokémon capturés</Text>
 
           <Aide />
@@ -190,6 +230,7 @@ export default function Index() {
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: "#f3f4f6" },
+  chargement: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f3f4f6" },
   contenu: { padding: 20 },
   ligne: { gap: 10 }, // espace entre les 2 colonnes
   carte: { flex: 1 }, // le Pressable prend la moitié de la ligne, comme la carte

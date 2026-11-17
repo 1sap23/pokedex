@@ -15,10 +15,14 @@ export const TYPE_COLORS = {
   Psy: "#F85888",
   Roche: "#B8A038",
   Spectre: "#705898",
+  // séance 6 : la fiche va jusqu'au n°151
+  Glace: "#98D8D8",
+  Dragon: "#7038F8",
 };
 
 export default function TypeBadge({ type }) {
-  const color = TYPE_COLORS[type];
+  // const color = TYPE_COLORS[type];
+  const color = TYPE_COLORS[type] || "#9ca3af"; // gris si le type est inconnu
   return (
     <View style={[styles.badge, { backgroundColor: color }]}>
       <Text style={styles.texte}>{type}</Text>

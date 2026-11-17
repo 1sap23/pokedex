@@ -7,7 +7,9 @@ const ARTWORK =
 
 export default function PokemonCard({ number, name, type, captured, onToggle }) {
   // la couleur de la carte depend du type
-  const color = TYPE_COLORS[type];
+  // const color = TYPE_COLORS[type];
+  // séance 6 : l'API ne donne pas le type dans la liste, alors gris par défaut
+  const color = TYPE_COLORS[type] || "#9ca3af";
 
   return (
     <View
@@ -22,7 +24,8 @@ export default function PokemonCard({ number, name, type, captured, onToggle }) 
       <View style={styles.infos}>
         <Text style={styles.numero}>#{number}</Text>
         <Text style={styles.nom}>{name}</Text>
-        <TypeBadge type={type} />
+        {/* <TypeBadge type={type} /> */}
+        {type && <TypeBadge type={type} />}
       </View>
 
       <Pressable
