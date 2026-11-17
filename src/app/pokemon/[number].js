@@ -16,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Faiblesses from "../../components/Faiblesses";
 import { TYPES_FR } from "../../data/types";
 import { useCollection } from "../../context/Collection";
+import CarteHolo from "../../components/CarteHolo";
 
 const ARTWORK =
   "https://raw.githubusercontent.com/PokeAPI/sprites" +
@@ -225,15 +226,14 @@ export default function FichePokemon() {
 
   // projet : la fiche façon livre
   return (
-    <ScrollView style={styles.page}>
+    // <ScrollView style={styles.page}>
+    <ScrollView style={[styles.page, styles.pageSombre]}>
       {/* le haut de l'écran prend aussi la couleur du type */}
       <Stack.Screen options={{ title: nom, headerStyle: { backgroundColor: color } }} />
 
-      {/* le bandeau de couleur avec le numéro et l'image */}
+      {/* ANCIEN (phase 1 à 3) : le bandeau, le nom et les types
       <View style={[styles.bandeau, { backgroundColor: color }]}>
         <Text style={styles.numero}>#{pokemon.id}</Text>
-        {/* <Image source={{ uri: `${ARTWORK}${pokemon.id}.png` }} style={styles.image} /> */}
-        {/* phase 1 : les images Shiny sont dans le dossier shiny/ */}
         <Image
           source={{ uri: `${ARTWORK}${shiny ? "shiny/" : ""}${pokemon.id}.png` }}
           style={styles.image}
@@ -241,21 +241,59 @@ export default function FichePokemon() {
           cachePolicy="memory-disk"
           transition={300} // fondu de 0,3 seconde entre normal et Shiny
         />
-        {/* phase 3 : les trois boutons sont sur une ligne */}
         <View style={styles.boutonsBandeau}>
           <Pressable style={styles.boutonShiny} onPress={() => setShiny(!shiny)}>
             <Ionicons name="sparkles" size={16} color={shiny ? "#facc15" : "#ffffff"} />
             <Text style={styles.boutonShinyTexte}>{shiny ? "Normal" : "Shiny"}</Text>
           </Pressable>
           <Pressable style={styles.boutonShiny} onPress={() => toggleFavori(resume)}>
-            {/* coeur plein si favori, coeur vide sinon */}
             <Ionicons name={favori ? "heart" : "heart-outline"} size={16} color="#ffffff" />
             <Text style={styles.boutonShinyTexte}>Favori</Text>
           </Pressable>
           <Pressable style={styles.boutonShiny} onPress={() => toggleEquipe(resume)}>
             <Ionicons name={dansEquipe ? "people" : "people-outline"} size={16} color="#ffffff" />
             <Text style={styles.boutonShinyTexte}>
-              {/* si l'équipe est pleine, on le dit */}
+              {dansEquipe ? "Dans l'équipe" : equipe.length < 6 ? "Équipe" : "Équipe pleine"}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+      <View style={styles.contenu}>
+        <Text style={styles.nom}>{nom}</Text>
+        {categorie !== "" && <Text style={styles.categorie}>{categorie}</Text>}
+        <View style={styles.types}>
+          {pokemon.types.map((t) => (
+            <TypeBadge key={t.type.name} type={TYPES_FR[t.type.name] || t.type.name} />
+          ))}
+        </View>
+      */}
+
+      {/* carte holo : la fiche commence par une vraie carte */}
+      <View style={styles.zoneCarte}>
+        <CarteHolo
+          pokemon={pokemon}
+          nom={nom}
+          categorie={categorie}
+          description={description}
+          types={resume.types}
+          color={color}
+          shiny={shiny}
+        />
+        <Text style={styles.astuce}>Fais glisser la carte ou penche ton téléphone ✦</Text>
+
+        {/* les trois boutons, maintenant sous la carte */}
+        <View style={styles.boutonsBandeau}>
+          <Pressable style={styles.boutonShiny} onPress={() => setShiny(!shiny)}>
+            <Ionicons name="sparkles" size={16} color={shiny ? "#facc15" : "#ffffff"} />
+            <Text style={styles.boutonShinyTexte}>{shiny ? "Normal" : "Shiny"}</Text>
+          </Pressable>
+          <Pressable style={styles.boutonShiny} onPress={() => toggleFavori(resume)}>
+            <Ionicons name={favori ? "heart" : "heart-outline"} size={16} color="#ffffff" />
+            <Text style={styles.boutonShinyTexte}>Favori</Text>
+          </Pressable>
+          <Pressable style={styles.boutonShiny} onPress={() => toggleEquipe(resume)}>
+            <Ionicons name={dansEquipe ? "people" : "people-outline"} size={16} color="#ffffff" />
+            <Text style={styles.boutonShinyTexte}>
               {dansEquipe ? "Dans l'équipe" : equipe.length < 6 ? "Équipe" : "Équipe pleine"}
             </Text>
           </Pressable>
@@ -263,16 +301,6 @@ export default function FichePokemon() {
       </View>
 
       <View style={styles.contenu}>
-        <Text style={styles.nom}>{nom}</Text>
-        {categorie !== "" && <Text style={styles.categorie}>{categorie}</Text>}
-
-        {/* tous les types, pas seulement le premier */}
-        <View style={styles.types}>
-          {pokemon.types.map((t) => (
-            <TypeBadge key={t.type.name} type={TYPES_FR[t.type.name] || t.type.name} />
-          ))}
-        </View>
-
         {/* phase 1 : les onglets de la fiche */}
         <View style={styles.onglets}>
           <Pressable
@@ -451,8 +479,12 @@ const styles = StyleSheet.create({
   evolutionNom: { fontSize: 13, fontWeight: "bold", color: "#111827" },
   // phase 1
   evolutionCondition: { fontSize: 11, color: "#6b7280", marginTop: 2 },
-  boutonShiny: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(0,0,0,0.25)", borderRadius: 20, paddingVertical: 6, paddingHorizontal: 14 },
+  boutonShiny: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(255,255,255,0.12)", borderRadius: 20, paddingVertical: 6, paddingHorizontal: 14 }, // carte holo : plus clair sur le fond sombre
   boutonShinyTexte: { color: "#ffffff", fontWeight: "bold" },
+  // carte holo
+  pageSombre: { backgroundColor: "#0f172a" },
+  zoneCarte: { paddingTop: 20, paddingBottom: 8, alignItems: "center" },
+  astuce: { fontSize: 12, color: "#94a3b8", marginTop: 12, marginBottom: 10 },
   boutonsBandeau: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 8 },
   onglets: { flexDirection: "row", backgroundColor: "#e5e7eb", borderRadius: 14, padding: 4, marginBottom: 16 },
   onglet: { flex: 1, paddingVertical: 8, borderRadius: 10, alignItems: "center" },

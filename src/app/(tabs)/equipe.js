@@ -44,7 +44,7 @@ export default function Equipe() {
           // place vide
           if (!p) {
             return (
-              <View key={i} style={[styles.place, styles.placeVide]}>
+              <View key={"place" + i} style={[styles.place, styles.placeVide]}>
                 <Ionicons name="add" size={28} color="#9ca3af" />
               </View>
             );
@@ -53,7 +53,7 @@ export default function Equipe() {
           const color = TYPE_COLORS[p.types[0]] || "#9ca3af";
           return (
             <Pressable
-              key={p.number}
+              key={"place" + i} // la place (0 à 5) : jamais deux fois la même clé
               style={[styles.place, { backgroundColor: color + "33", borderColor: color }]}
               onPress={() => router.push(`/pokemon/${p.number}`)}
             >
