@@ -11,7 +11,8 @@ import { FlatList, ScrollView, ActivityIndicator, View, Text, Pressable, TextInp
 import EntetePokeball from "../../components/EntetePokeball";
 import PokemonCard from "../../components/PokemonCard";
 import Aide from "../../components/Aide";
-import REGIONS from "../../data/regions";
+import REGIONS, { LEGENDAIRES } from "../../data/regions";
+import { chargerLegendaires } from "../../data/api";
 import { useCollection } from "../../context/Collection";
 import { TYPES_FR } from "../../data/types";
 // ANCIEN (séance 4 et 5) : les 100 Pokémon écrits à la main, remplacés par la PokéAPI
@@ -66,6 +67,11 @@ export default function Index() {
 
   // séance 6 : on va chercher la liste sur Internet
   async function charger() {
+    // légendaires : le bouton doré a sa propre liste
+    if (region.legendaires) {
+      setPokemons(await chargerLegendaires());
+      return;
+    }
     // phase 4 : on essaie d'abord GraphQL (noms français + types)
     try {
       const reponse = await fetch(GRAPHQL, {
@@ -241,10 +247,23 @@ export default function Index() {
           {/* <Titre texte="Mon Pokédex" sousTitre={`${pokemons.length} Pokémon`} /> */}
           {/* <EntetePokeball titre="Mon Pokédex" sousTitre={`${pokemons.length} Pokémon`} /> */}
           {/* <EntetePokeball titre="Mon Pokédex" sousTitre={`${region.nom} · ${pokemons.length} Pokémon`} /> */}
-          <EntetePokeball titre="Mon Pokédex" sousTitre={`Pokédex de ${region.nom}`} />
+          {/* <EntetePokeball titre="Mon Pokédex" sousTitre={`Pokédex de ${region.nom}`} /> */}
+          <EntetePokeball
+            titre="Mon Pokédex"
+            sousTitre={region.legendaires ? "Légendaires et Fabuleux" : `Pokédex de ${region.nom}`}
+          />
 
           {/* projet : un bouton par région, on peut faire défiler sur le côté */}
           <ScrollView horizontal style={styles.regions}>
+            {/* légendaires : le bouton doré, avant les régions */}
+            <Pressable
+              style={[styles.region, styles.legende, region.legendaires && styles.legendeChoisie]}
+              onPress={() => setRegion(LEGENDAIRES)}
+            >
+              <Text style={[styles.regionTexte, styles.legendeTexte, region.legendaires && styles.regionTexteChoisi]}>
+                ✦ Légendaires
+              </Text>
+            </Pressable>
             {REGIONS.map((r) => (
               <Pressable
                 key={r.nom}
@@ -374,6 +393,7 @@ export default function Index() {
             number={item.number}
             name={item.name}
             type={item.type}
+            rang={item.rang} // légendaires : "Légendaire", "Fabuleux" ou rien
             captured={captured.includes(item.number)}
             // onToggle={() => toggle(item.number)}
             onToggle={() => toggleCapture(item.number)}
@@ -397,6 +417,10 @@ const styles = StyleSheet.create({
   regionChoisie: { backgroundColor: "#e3350d" },
   regionTexte: { color: "#e3350d", fontWeight: "bold" },
   regionTexteChoisi: { color: "#ffffff" },
+  // légendaires : le bouton doré
+  legende: { borderColor: "#d97706" },
+  legendeChoisie: { backgroundColor: "#d97706" },
+  legendeTexte: { color: "#d97706" },
   // phase 1 : les petites cartes, la recherche et les filtres
   statsLigne: { flexDirection: "row", gap: 8, marginBottom: 12 },
   statCarte: { flex: 1, backgroundColor: "#ffffff", borderRadius: 14, paddingVertical: 10, alignItems: "center" },

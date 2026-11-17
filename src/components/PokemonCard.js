@@ -9,7 +9,7 @@ const ARTWORK =
   "https://raw.githubusercontent.com/PokeAPI/sprites" +
   "/master/sprites/pokemon/other/official-artwork/";
 
-export default function PokemonCard({ number, name, type, captured, onToggle }) {
+export default function PokemonCard({ number, name, type, captured, onToggle, rang }) {
   // thème : les couleurs du mode clair ou sombre
   const { couleurs: c } = useTheme();
   // la couleur de la carte depend du type
@@ -34,6 +34,10 @@ export default function PokemonCard({ number, name, type, captured, onToggle }) 
         <Text style={[styles.nom, { color: c.texte }]}>{name}</Text>
         {/* <TypeBadge type={type} /> */}
         {type && <TypeBadge type={type} />}
+        {/* légendaires : un petit ruban doré (violet pour les Fabuleux) */}
+        {rang && (
+          <Text style={[styles.rang, rang === "Fabuleux" && styles.rangFabuleux]}>✦ {rang}</Text>
+        )}
       </View>
 
       <Pressable
@@ -75,5 +79,7 @@ const styles = StyleSheet.create({
   nom: { fontSize: 16, fontWeight: "bold", color: "#111827" },
   bouton: { backgroundColor: "#2f5be7", paddingVertical: 8, paddingHorizontal: 12, borderRadius: 10 },
   boutonCapture: { backgroundColor: "#16a34a" },
+  rang: { marginTop: 4, fontSize: 11, fontWeight: "900", color: "#ffffff", backgroundColor: "#d97706", paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8, overflow: "hidden" },
+  rangFabuleux: { backgroundColor: "#7c3aed" },
   boutonTexte: { color: "#ffffff", fontWeight: "bold" },
 });

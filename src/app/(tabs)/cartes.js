@@ -6,7 +6,7 @@ import { router } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { TYPE_COLORS } from "../../components/TypeBadge";
 import TypeIcone from "../../components/TypeIcone";
-import REGIONS from "../../data/regions";
+import REGIONS, { LEGENDAIRES } from "../../data/regions";
 import { chargerRegion } from "../../data/api";
 import { useTheme } from "../../context/Theme";
 
@@ -53,6 +53,15 @@ export default function Cartes() {
 
           {/* les régions, comme dans le Pokédex */}
           <ScrollView horizontal style={styles.regions}>
+            {/* légendaires : le bouton doré, avant les régions */}
+            <Pressable
+              style={[styles.region, styles.legende, region.legendaires && styles.legendeChoisie]}
+              onPress={() => setRegion(LEGENDAIRES)}
+            >
+              <Text style={[styles.regionTexte, styles.legendeTexte, region.legendaires && styles.regionTexteChoisi]}>
+                ✦ Légendaires
+              </Text>
+            </Pressable>
             {REGIONS.map((r) => (
               <Pressable
                 key={r.nom}
@@ -125,6 +134,10 @@ const styles = StyleSheet.create({
   regionChoisie: { backgroundColor: "#e3350d" },
   regionTexte: { color: "#e3350d", fontWeight: "bold" },
   regionTexteChoisi: { color: "#ffffff" },
+  // légendaires : le bouton doré
+  legende: { borderColor: "#d97706" },
+  legendeChoisie: { backgroundColor: "#d97706" },
+  legendeTexte: { color: "#d97706" },
   recherche: { flexDirection: "row", alignItems: "center", gap: 8, borderRadius: 12, paddingHorizontal: 12, marginBottom: 14 },
   rechercheChamp: { flex: 1, paddingVertical: 10 },
   chargement: { marginTop: 40 },

@@ -11,4 +11,8 @@ const REGIONS = [
   { nom: "Paldea", debut: 906, fin: 1025 },
 ];
 
+// légendaires : pas une vraie région, mais un bouton doré à part
+// legendaires: true dit au Pokédex de charger les Légendaires et Fabuleux
+export const LEGENDAIRES = { nom: "Légendaires", legendaires: true };
+
 export default REGIONS;

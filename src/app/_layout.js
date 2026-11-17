@@ -34,7 +34,8 @@ function Pile() {
         contentStyle: { backgroundColor: c.fond }, // le fond derrière les écrans
       }}
     >
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      {/* title : le texte du bouton retour de la fiche (avant, on lisait "(tabs)") */}
+      <Stack.Screen name="(tabs)" options={{ headerShown: false, title: "Retour" }} />
     </Stack>
   );
 }

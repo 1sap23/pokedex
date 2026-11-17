@@ -86,7 +86,9 @@ export default function Evolutions3D({ evolutions, actuel }) {
         snapToInterval={LARGEUR} // on s'arrête toujours pile sur un Pokémon
         decelerationRate="fast"
         contentOffset={{ x: depart * LARGEUR, y: 0 }}
-        contentContainerStyle={{ paddingHorizontal: marge }}
+        // paddingBottom : le Pokémon du centre est agrandi (x1.15),
+        // sans cette marge le bas (niveau, forme) était coupé
+        contentContainerStyle={{ paddingHorizontal: marge, paddingTop: 10, paddingBottom: 34 }}
         scrollEventThrottle={16}
         // Animated.event : la position du défilement va directement dans "defile"
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: defile } } }], { useNativeDriver: false })}
@@ -161,7 +163,7 @@ const styles = StyleSheet.create({
   image: { width: 130, height: 130, marginBottom: 6 },
   nom: { fontSize: 14, fontWeight: "900", color: "#ffffff" },
   condition: { fontSize: 11, color: "#fde68a", fontWeight: "bold" },
-  panneau: { backgroundColor: "rgba(0,0,0,0.3)", marginHorizontal: 12, marginTop: 22, borderRadius: 16, padding: 12, minHeight: 120, justifyContent: "center" },
+  panneau: { backgroundColor: "rgba(0,0,0,0.3)", marginHorizontal: 12, marginTop: 0, borderRadius: 16, padding: 12, minHeight: 120, justifyContent: "center" },
   panneauLigne: { flexDirection: "row", alignItems: "center" },
   panneauDroite: { flex: 1, paddingLeft: 8 },
   panneauNom: { fontSize: 20, fontWeight: "900", color: "#ffffff" },
