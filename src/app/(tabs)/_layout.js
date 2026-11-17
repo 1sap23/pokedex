@@ -1,7 +1,12 @@
 import { Tabs } from "expo-router";
+import { Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "../../context/Theme";
 
 export default function TabsLayout() {
+  // thème : les couleurs de la barre du bas et le bouton soleil / lune
+  const { couleurs: c, sombre, setMode } = useTheme();
+
   return (
     // ANCIEN (séance 5) : <Tabs>
     // le haut en rouge Poké Ball et l'onglet choisi en rouge
@@ -10,6 +15,15 @@ export default function TabsLayout() {
         headerStyle: { backgroundColor: "#e3350d" },
         headerTintColor: "#ffffff",
         tabBarActiveTintColor: "#e3350d",
+        // thème : la barre du bas suit le mode clair / sombre
+        tabBarInactiveTintColor: c.texteDoux,
+        tabBarStyle: { backgroundColor: c.barre, borderTopColor: c.bordure },
+        // thème : un bouton en haut à droite de chaque onglet
+        headerRight: () => (
+          <Pressable style={{ marginRight: 16 }} onPress={() => setMode(sombre ? "clair" : "sombre")}>
+            <Ionicons name={sombre ? "sunny" : "moon"} size={22} color="#ffffff" />
+          </Pressable>
+        ),
       }}
     >
       <Tabs.Screen
@@ -18,6 +32,16 @@ export default function TabsLayout() {
           title: "Pokédex",
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="list" size={size} color={color} />
+          ),
+        }}
+      />
+      {/* cartes : la collection des cartes holo */}
+      <Tabs.Screen
+        name="cartes"
+        options={{
+          title: "Cartes",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="albums" size={size} color={color} />
           ),
         }}
       />

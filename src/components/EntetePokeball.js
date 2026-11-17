@@ -1,8 +1,11 @@
+import { useTheme } from "../context/Theme";
 import { View, Text, StyleSheet } from "react-native";
 
 // un en-tête qui ressemble à une Poké Ball :
 // le haut rouge, une bande noire avec un bouton blanc, le bas blanc
 export default function EntetePokeball({ titre, sousTitre }) {
+  // thème : les couleurs du mode clair ou sombre
+  const { couleurs: c } = useTheme();
   return (
     <View style={styles.boule}>
       <View style={styles.haut}>
@@ -13,8 +16,8 @@ export default function EntetePokeball({ titre, sousTitre }) {
         <View style={styles.bouton} />
       </View>
 
-      <View style={styles.bas}>
-        <Text style={styles.sousTitre}>{sousTitre}</Text>
+      <View style={[styles.bas, { backgroundColor: c.surface }]}>
+        <Text style={[styles.sousTitre, { color: c.texteDoux }]}>{sousTitre}</Text>
       </View>
     </View>
   );

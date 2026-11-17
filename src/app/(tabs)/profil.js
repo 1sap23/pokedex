@@ -1,3 +1,4 @@
+import { useTheme } from "../../context/Theme";
 import { View, Text, Image, Pressable, Alert, StyleSheet } from "react-native";
 import Tag from "../../components/Tag";
 import Avatar from "../../components/Avatar";
@@ -10,12 +11,14 @@ const ARTWORK =
   "/master/sprites/pokemon/other/official-artwork/";
 
 export default function Profil() {
+  // thème : les couleurs du mode clair ou sombre
+  const { couleurs: c } = useTheme();
   return (
-    <View style={styles.container}>
-      <View style={styles.carte}>
+    <View style={[styles.container, { backgroundColor: c.fond }]}>
+      <View style={[styles.carte, { backgroundColor: c.surface }]}>
         <Avatar uri="https://i.pravatar.cc/200" size={110} />
-        <Text style={styles.nom}>Ange Vanessa</Text>
-        <Text style={styles.description}>Élève ingénieure · ISEN 3</Text>
+        <Text style={[styles.nom, { color: c.texte }]}>Ange Vanessa</Text>
+        <Text style={[styles.description, { color: c.texteDoux }]}>Élève ingénieure · ISEN 3</Text>
 
         <View style={styles.tags}>
           {INTERETS.map((interet) => (
@@ -27,10 +30,10 @@ export default function Profil() {
         <InfoLigne label="Ville" value="Toulon" />
         <InfoLigne label="École" value="ISEN Méditerranée" />
 
-        <Text style={styles.prefereTitre}>Mon Pokémon préféré</Text>
+        <Text style={[styles.prefereTitre, { color: c.texte }]}>Mon Pokémon préféré</Text>
         <Image source={{ uri: `${ARTWORK}493.png` }} style={styles.prefereImage} />
-        <Text style={styles.prefereNom}>Arceus</Text>
-        <Text style={styles.description}>J'adore les Pokémon légendaires</Text>
+        <Text style={[styles.prefereNom, { color: c.texte }]}>Arceus</Text>
+        <Text style={[styles.description, { color: c.texteDoux }]}>J'adore les Pokémon légendaires</Text>
 
         <View style={styles.contour}>
           <Pressable

@@ -1,10 +1,13 @@
+import { useTheme } from "../context/Theme";
 import { View, Text, StyleSheet } from "react-native";
 
 export default function InfoLigne({ label, value }) {
+  // thème : les couleurs du mode clair ou sombre
+  const { couleurs: c } = useTheme();
   return (
-    <View style={styles.ligne}>
-      <Text style={styles.label}>{label}</Text>
-      <Text style={styles.value}>{value}</Text>
+    <View style={[styles.ligne, { borderBottomColor: c.bordure }]}>
+      <Text style={[styles.label, { color: c.texteDoux }]}>{label}</Text>
+      <Text style={[styles.value, { color: c.texte }]}>{value}</Text>
     </View>
   );
 }

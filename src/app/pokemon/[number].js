@@ -1,3 +1,4 @@
+import { useTheme } from "../../context/Theme";
 // ANCIEN (séance 5) : import { View, Text, Image, StyleSheet } from "react-native";
 import { useState, useEffect } from "react";
 // ANCIEN (séance 6) : import { View, Text, Image, ActivityIndicator, StyleSheet } from "react-native";
@@ -17,6 +18,8 @@ import Faiblesses from "../../components/Faiblesses";
 import { TYPES_FR } from "../../data/types";
 import { useCollection } from "../../context/Collection";
 import CarteHolo from "../../components/CarteHolo";
+import SceneType from "../../components/SceneType";
+import Evolutions3D from "../../components/Evolutions3D";
 
 const ARTWORK =
   "https://raw.githubusercontent.com/PokeAPI/sprites" +
@@ -59,6 +62,8 @@ const STATS_FR = {
 
 export default function FichePokemon() {
   const { number } = useLocalSearchParams();
+  // thème : les couleurs du mode clair ou sombre
+  const { couleurs: c } = useTheme();
   // ANCIEN (séance 5) :
   // number est un texte dans l'adresse, on le transforme en nombre
   // const pokemon = POKEMONS.find((p) => p.number === Number(number));
@@ -143,11 +148,33 @@ export default function FichePokemon() {
           name: nomEspece ? nomEspece.name : espece.name,
           condition: condition,
         });
+        // évolutions 3D : on ajoute aussi les autres formes de ce Pokémon
+        // (Méga-Évolution, Gigamax, forme d'Alola...). is_default = la forme normale
+        for (const v of espece.varieties) {
+          if (!v.is_default) {
+            // l'adresse finit par le numéro : ".../pokemon/10034/"
+            const id = Number(v.pokemon.url.split("/")[6]);
+            liste.push({
+              number: id,
+              name: (nomEspece ? nomEspece.name : espece.name) + " " + nomForme(v.pokemon.name, espece.name),
+              condition: "Forme",
+            });
+          }
+        }
         suivant = [...suivant, ...e.evolves_to];
       }
       etage = suivant;
     }
     setEvolutions(liste);
+  }
+
+  // évolutions 3D : "charizard-mega-x" devient "Méga X"
+  function nomForme(nomVariete, nomEspece) {
+    const MOTS = { mega: "Méga", gmax: "Gigamax", alola: "d'Alola", galar: "de Galar", hisui: "de Hisui", paldea: "de Paldea", primal: "Primo" };
+    const morceaux = nomVariete.replace(nomEspece + "-", "").split("-");
+    return morceaux
+      .map((m) => MOTS[m] || m[0].toUpperCase() + m.slice(1))
+      .join(" ");
   }
 
   // phase 1 : transforme les détails d'une évolution en petit texte
@@ -181,7 +208,7 @@ export default function FichePokemon() {
 
   if (pokemon === null) {
     return (
-      <View style={styles.chargement}>
+      <View style={[styles.chargement, { backgroundColor: c.fond }]}>
         <ActivityIndicator size="large" color="#2f5be7" />
       </View>
     );
@@ -218,8 +245,8 @@ export default function FichePokemon() {
   //     <TypeBadge type={TYPES_FR[type] || type} />
   //
   //     <View style={styles.infos}>
-  //       <Text style={styles.info}>Taille : {pokemon.height / 10} m</Text>
-  //       <Text style={styles.info}>Poids : {pokemon.weight / 10} kg</Text>
+  //       <Text style={[styles.info, { backgroundColor: c.surface }]}>Taille : {pokemon.height / 10} m</Text>
+  //       <Text style={[styles.info, { backgroundColor: c.surface }]}>Poids : {pokemon.weight / 10} kg</Text>
   //     </View>
   //   </View>
   // );
@@ -227,7 +254,7 @@ export default function FichePokemon() {
   // projet : la fiche façon livre
   return (
     // <ScrollView style={styles.page}>
-    <ScrollView style={[styles.page, styles.pageSombre]}>
+    <ScrollView style={[styles.page, { backgroundColor: c.fond }]}>
       {/* le haut de l'écran prend aussi la couleur du type */}
       <Stack.Screen options={{ title: nom, headerStyle: { backgroundColor: color } }} />
 
@@ -268,7 +295,7 @@ export default function FichePokemon() {
         </View>
       */}
 
-      {/* carte holo : la fiche commence par une vraie carte */}
+      {/* ANCIEN (carte holo) : la carte est maintenant dans l'onglet Cartes
       <View style={styles.zoneCarte}>
         <CarteHolo
           pokemon={pokemon}
@@ -280,6 +307,18 @@ export default function FichePokemon() {
           shiny={shiny}
         />
         <Text style={styles.astuce}>Fais glisser la carte ou penche ton téléphone ✦</Text>
+      */}
+
+      {/* scène : le Pokémon jaillit d'une scène de son type */}
+      <SceneType
+        uri={`${ARTWORK}${shiny ? "shiny/" : ""}${pokemon.id}.png`}
+        nom={nom}
+        numero={String(pokemon.id).padStart(3, "0")}
+        categorie={categorie}
+        types={resume.types}
+        fondPage={c.fond}
+      />
+      <View style={styles.zoneCarte}>
 
         {/* les trois boutons, maintenant sous la carte */}
         <View style={styles.boutonsBandeau}>
@@ -302,12 +341,12 @@ export default function FichePokemon() {
 
       <View style={styles.contenu}>
         {/* phase 1 : les onglets de la fiche */}
-        <View style={styles.onglets}>
+        <View style={[styles.onglets, { backgroundColor: c.surfaceDouce }]}>
           <Pressable
             style={[styles.onglet, onglet === "apropos" && { backgroundColor: color }]}
             onPress={() => setOnglet("apropos")}
           >
-            <Text style={[styles.ongletTexte, onglet === "apropos" && styles.ongletTexteChoisi]}>
+            <Text style={[styles.ongletTexte, { color: c.texteDoux }, onglet === "apropos" && styles.ongletTexteChoisi]}>
               À propos
             </Text>
           </Pressable>
@@ -315,7 +354,7 @@ export default function FichePokemon() {
             style={[styles.onglet, onglet === "stats" && { backgroundColor: color }]}
             onPress={() => setOnglet("stats")}
           >
-            <Text style={[styles.ongletTexte, onglet === "stats" && styles.ongletTexteChoisi]}>
+            <Text style={[styles.ongletTexte, { color: c.texteDoux }, onglet === "stats" && styles.ongletTexteChoisi]}>
               Stats
             </Text>
           </Pressable>
@@ -323,7 +362,7 @@ export default function FichePokemon() {
             style={[styles.onglet, onglet === "evolutions" && { backgroundColor: color }]}
             onPress={() => setOnglet("evolutions")}
           >
-            <Text style={[styles.ongletTexte, onglet === "evolutions" && styles.ongletTexteChoisi]}>
+            <Text style={[styles.ongletTexte, { color: c.texteDoux }, onglet === "evolutions" && styles.ongletTexteChoisi]}>
               Évolutions
             </Text>
           </Pressable>
@@ -332,7 +371,7 @@ export default function FichePokemon() {
             style={[styles.onglet, onglet === "combat" && { backgroundColor: color }]}
             onPress={() => setOnglet("combat")}
           >
-            <Text style={[styles.ongletTexte, onglet === "combat" && styles.ongletTexteChoisi]}>
+            <Text style={[styles.ongletTexte, { color: c.texteDoux }, onglet === "combat" && styles.ongletTexteChoisi]}>
               Combat
             </Text>
           </Pressable>
@@ -340,8 +379,8 @@ export default function FichePokemon() {
 
         {/* ===== onglet Combat ===== */}
         {onglet === "combat" && (
-          <View style={styles.bloc}>
-            <Text style={styles.titreBloc}>Faiblesses et résistances</Text>
+          <View style={[styles.bloc, { backgroundColor: c.surface }]}>
+            <Text style={[styles.titreBloc, { color: c.texte }]}>Faiblesses et résistances</Text>
             {/* les types du Pokémon en français, ex : ["Feu", "Vol"] */}
             <Faiblesses types={pokemon.types.map((t) => TYPES_FR[t.type.name])} />
           </View>
@@ -351,28 +390,28 @@ export default function FichePokemon() {
         {onglet === "apropos" && (
         <View>
         {description !== "" && (
-          <View style={styles.bloc}>
-            <Text style={styles.description}>{description}</Text>
+          <View style={[styles.bloc, { backgroundColor: c.surface }]}>
+            <Text style={[styles.description, { color: c.texteDoux }]}>{description}</Text>
           </View>
         )}
 
         <View style={styles.infos}>
-          <View style={styles.info}>
-            <Text style={styles.infoTitre}>Taille</Text>
-            <Text style={styles.infoValeur}>{pokemon.height / 10} m</Text>
+          <View style={[styles.info, { backgroundColor: c.surface }]}>
+            <Text style={[styles.infoTitre, { color: c.texteDoux }]}>Taille</Text>
+            <Text style={[styles.infoValeur, { color: c.texte }]}>{pokemon.height / 10} m</Text>
           </View>
-          <View style={styles.info}>
-            <Text style={styles.infoTitre}>Poids</Text>
-            <Text style={styles.infoValeur}>{pokemon.weight / 10} kg</Text>
+          <View style={[styles.info, { backgroundColor: c.surface }]}>
+            <Text style={[styles.infoTitre, { color: c.texteDoux }]}>Poids</Text>
+            <Text style={[styles.infoValeur, { color: c.texte }]}>{pokemon.weight / 10} kg</Text>
           </View>
         </View>
 
         {/* phase 1 : les talents, le talent caché est signalé */}
-        <View style={styles.bloc}>
-          <Text style={styles.titreBloc}>Talents</Text>
+        <View style={[styles.bloc, { backgroundColor: c.surface }]}>
+          <Text style={[styles.titreBloc, { color: c.texte }]}>Talents</Text>
           {talents.map((t) => (
             <View key={t.nom} style={styles.talent}>
-              <Text style={styles.talentNom}>{t.nom}</Text>
+              <Text style={[styles.talentNom, { color: c.texte }]}>{t.nom}</Text>
               {t.cache && <Text style={[styles.talentCache, { color: color }]}>caché</Text>}
             </View>
           ))}
@@ -382,14 +421,14 @@ export default function FichePokemon() {
 
         {/* ===== onglet Stats ===== */}
         {onglet === "stats" && (
-        <View style={styles.bloc}>
-          <Text style={styles.titreBloc}>Statistiques</Text>
+        <View style={[styles.bloc, { backgroundColor: c.surface }]}>
+          <Text style={[styles.titreBloc, { color: c.texte }]}>Statistiques</Text>
           {pokemon.stats.map((s) => (
             <View key={s.stat.name} style={styles.stat}>
-              <Text style={styles.statNom}>{STATS_FR[s.stat.name]}</Text>
-              <Text style={styles.statValeur}>{s.base_stat}</Text>
+              <Text style={[styles.statNom, { color: c.texteDoux }]}>{STATS_FR[s.stat.name]}</Text>
+              <Text style={[styles.statValeur, { color: c.texte }]}>{s.base_stat}</Text>
               {/* le fond gris, et dedans la barre de couleur */}
-              <View style={styles.barreFond}>
+              <View style={[styles.barreFond, { backgroundColor: c.surfaceDouce }]}>
                 {/* 255 est la plus grande valeur possible, on la met à 100 % */}
                 <View
                   style={[
@@ -402,42 +441,46 @@ export default function FichePokemon() {
           ))}
           {/* phase 1 : le total */}
           <View style={styles.stat}>
-            <Text style={[styles.statNom, styles.totalTexte]}>Total</Text>
-            <Text style={[styles.statValeur, styles.totalTexte]}>{total}</Text>
+            <Text style={[styles.statNom, { color: c.texteDoux }, styles.totalTexte]}>Total</Text>
+            <Text style={[styles.statValeur, { color: c.texte }, styles.totalTexte]}>{total}</Text>
           </View>
         </View>
         )}
 
         {/* ===== onglet Évolutions ===== */}
         {onglet === "evolutions" && evolutions.length <= 1 && (
-          <View style={styles.bloc}>
-            <Text style={styles.description}>Ce Pokémon n'évolue pas.</Text>
+          <View style={[styles.bloc, { backgroundColor: c.surface }]}>
+            <Text style={[styles.description, { color: c.texteDoux }]}>Ce Pokémon n'évolue pas.</Text>
           </View>
         )}
 
-        {/* projet : les évolutions, seulement si le Pokémon en a */}
-        {/* {evolutions.length > 1 && ( */}
+        {/* ANCIEN (projet et phase 1) : la grille des évolutions
         {onglet === "evolutions" && evolutions.length > 1 && (
-          <View style={styles.bloc}>
-            <Text style={styles.titreBloc}>Évolutions</Text>
+          <View style={[styles.bloc, { backgroundColor: c.surface }]}>
+            <Text style={[styles.titreBloc, { color: c.texte }]}>Évolutions</Text>
             <View style={styles.evolutions}>
               {evolutions.map((e) => (
                 <Pressable
                   key={e.number}
                   // le Pokémon de la fiche est entouré de sa couleur
-                  style={[styles.evolution, e.number === pokemon.id && { borderColor: color }]}
+                  style={[styles.evolution, { backgroundColor: c.surfaceDouce, borderColor: c.surfaceDouce }, e.number === pokemon.id && { borderColor: color }]}
                   onPress={() => router.push(`/pokemon/${e.number}`)}
                 >
                   <Image source={{ uri: `${ARTWORK}${e.number}.png` }} style={styles.evolutionImage} contentFit="contain" cachePolicy="memory-disk" />
-                  <Text style={styles.evolutionNom}>{e.name}</Text>
-                  {/* phase 1 : comment on l'obtient */}
+                  <Text style={[styles.evolutionNom, { color: c.texte }]}>{e.name}</Text>
                   {e.condition !== "" && (
-                    <Text style={styles.evolutionCondition}>{e.condition}</Text>
+                    <Text style={[styles.evolutionCondition, { color: c.texteDoux }]}>{e.condition}</Text>
                   )}
                 </Pressable>
               ))}
             </View>
           </View>
+        )}
+        */}
+
+        {/* évolutions 3D : le carrousel qui tourne, avec les stats du Pokémon touché */}
+        {onglet === "evolutions" && evolutions.length > 1 && (
+          <Evolutions3D evolutions={evolutions} actuel={pokemon.id} />
         )}
       </View>
     </ScrollView>
@@ -479,11 +522,12 @@ const styles = StyleSheet.create({
   evolutionNom: { fontSize: 13, fontWeight: "bold", color: "#111827" },
   // phase 1
   evolutionCondition: { fontSize: 11, color: "#6b7280", marginTop: 2 },
-  boutonShiny: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(255,255,255,0.12)", borderRadius: 20, paddingVertical: 6, paddingHorizontal: 14 }, // carte holo : plus clair sur le fond sombre
+  boutonShiny: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#334155", borderRadius: 20, paddingVertical: 6, paddingHorizontal: 14 }, // thème : un gris ardoise lisible en clair comme en sombre
   boutonShinyTexte: { color: "#ffffff", fontWeight: "bold" },
   // carte holo
   pageSombre: { backgroundColor: "#0f172a" },
-  zoneCarte: { paddingTop: 20, paddingBottom: 8, alignItems: "center" },
+  // zoneCarte: { paddingTop: 20, paddingBottom: 8, alignItems: "center" },
+  zoneCarte: { paddingTop: 4, paddingBottom: 8, alignItems: "center" }, // scène : les boutons juste sous l'image
   astuce: { fontSize: 12, color: "#94a3b8", marginTop: 12, marginBottom: 10 },
   boutonsBandeau: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 8 },
   onglets: { flexDirection: "row", backgroundColor: "#e5e7eb", borderRadius: 14, padding: 4, marginBottom: 16 },
@@ -494,5 +538,5 @@ const styles = StyleSheet.create({
   talent: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 6 },
   talentNom: { fontSize: 16, color: "#111827" },
   talentCache: { fontSize: 12, fontWeight: "bold" },
-  totalTexte: { fontWeight: "bold", color: "#111827" },
+  totalTexte: { fontWeight: "bold" },
 });

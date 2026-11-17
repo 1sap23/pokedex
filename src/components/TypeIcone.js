@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { TYPE_COLORS } from "./TypeBadge";
 
 // carte holo : chaque type a un petit symbole, comme l'énergie sur les cartes
-const ICONES = {
+export const ICONES = { // exporté : la scène de la fiche s'en sert pour ses particules
   Normal: "ellipse",
   Feu: "flame",
   Eau: "water",

@@ -1,3 +1,4 @@
+import { useTheme } from "../../context/Theme";
 // ANCIEN (avant la phase 4) : import { ScrollView, View, Text, Image, Pressable, StyleSheet } from "react-native";
 import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
 // phase 4 : l'Image d'expo-image garde les images en cache (plus rapide)
@@ -17,6 +18,8 @@ const PLACES = [0, 1, 2, 3, 4, 5];
 
 // phase 3 : l'équipe de 6 Pokémon et ses points faibles
 export default function Equipe() {
+  // thème : les couleurs du mode clair ou sombre
+  const { couleurs: c } = useTheme();
   const { equipe, toggleEquipe } = useCollection();
 
   // pour chaque type d'attaque, on compte combien de membres sont faibles
@@ -33,9 +36,9 @@ export default function Equipe() {
     .sort((a, b) => b.faibles - a.faibles);
 
   return (
-    <ScrollView style={styles.page} contentContainerStyle={styles.contenu}>
-      <Text style={styles.titre}>Mon équipe</Text>
-      <Text style={styles.texte}>{equipe.length} / 6 Pokémon</Text>
+    <ScrollView style={[styles.page, { backgroundColor: c.fond }]} contentContainerStyle={styles.contenu}>
+      <Text style={[styles.titre, { color: c.texte }]}>Mon équipe</Text>
+      <Text style={[styles.texte, { color: c.texteDoux }]}>{equipe.length} / 6 Pokémon</Text>
 
       <View style={styles.grille}>
         {PLACES.map((i) => {
@@ -44,7 +47,7 @@ export default function Equipe() {
           // place vide
           if (!p) {
             return (
-              <View key={"place" + i} style={[styles.place, styles.placeVide]}>
+              <View key={"place" + i} style={[styles.place, styles.placeVide, { backgroundColor: c.surface, borderColor: c.bordure }]}>
                 <Ionicons name="add" size={28} color="#9ca3af" />
               </View>
             );
@@ -62,28 +65,28 @@ export default function Equipe() {
                 <Ionicons name="close" size={14} color="#ffffff" />
               </Pressable>
               <Image source={{ uri: `${ARTWORK}${p.number}.png` }} style={styles.image} contentFit="contain" cachePolicy="memory-disk" />
-              <Text style={styles.nom}>{p.name}</Text>
+              <Text style={[styles.nom, { color: c.texte }]}>{p.name}</Text>
             </Pressable>
           );
         })}
       </View>
 
       {equipe.length === 0 && (
-        <Text style={styles.vide}>
+        <Text style={[styles.vide, { color: c.texteDoux }]}>
           Ouvre la fiche d'un Pokémon et appuie sur « Équipe » pour l'ajouter.
         </Text>
       )}
 
       {equipe.length > 0 && (
-        <View style={styles.bloc}>
-          <Text style={styles.titreBloc}>Points faibles de l'équipe</Text>
+        <View style={[styles.bloc, { backgroundColor: c.surface }]}>
+          <Text style={[styles.titreBloc, { color: c.texte }]}>Points faibles de l'équipe</Text>
           {pointsFaibles.length === 0 && (
-            <Text style={styles.texte}>Aucun gros point faible, bien joué !</Text>
+            <Text style={[styles.texte, { color: c.texteDoux }]}>Aucun gros point faible, bien joué !</Text>
           )}
           {pointsFaibles.map((a) => (
             <View key={a.type} style={styles.analyseLigne}>
               <TypeBadge type={a.type} />
-              <Text style={styles.analyseTexte}>
+              <Text style={[styles.analyseTexte, { color: c.texteDoux }]}>
                 {a.faibles} faible{a.faibles > 1 ? "s" : ""} · {a.resistants} résiste
                 {a.resistants > 1 ? "nt" : ""}
               </Text>

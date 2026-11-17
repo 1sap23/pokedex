@@ -1,7 +1,10 @@
+import { useTheme } from "../context/Theme";
 import { useState } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 
 export default function Aide() {
+  // thème : les couleurs du mode clair ou sombre
+  const { couleurs: c } = useTheme();
   const [visible, setVisible] = useState(false);
 
   return (
@@ -13,7 +16,7 @@ export default function Aide() {
       </Pressable>
 
       {visible && (
-        <Text style={styles.texte}>
+        <Text style={[styles.texte, { color: c.texteDoux }]}>
           Golden brown, the commencement of evil forebodings. Heading south,
           the breeze from the icy climes of the north was never strangled.
         </Text>

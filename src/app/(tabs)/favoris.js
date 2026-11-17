@@ -1,3 +1,4 @@
+import { useTheme } from "../../context/Theme";
 // ANCIEN (avant la phase 4) : import { FlatList, View, Text, Image, Pressable, StyleSheet } from "react-native";
 import { FlatList, View, Text, Pressable, StyleSheet } from "react-native";
 // phase 4 : l'Image d'expo-image garde les images en cache (plus rapide)
@@ -12,20 +13,22 @@ const ARTWORK =
 
 // phase 3 : les Pokémon mis en favori depuis leur fiche
 export default function Favoris() {
+  // thème : les couleurs du mode clair ou sombre
+  const { couleurs: c } = useTheme();
   const { favoris } = useCollection();
 
   return (
     <FlatList
-      style={styles.page}
+      style={[styles.page, { backgroundColor: c.fond }]}
       contentContainerStyle={styles.contenu}
       data={favoris}
       keyExtractor={(item) => String(item.number)}
       numColumns={2}
       columnWrapperStyle={styles.ligne}
-      ListHeaderComponent={<Text style={styles.titre}>Mes favoris</Text>}
+      ListHeaderComponent={<Text style={[styles.titre, { color: c.texte }]}>Mes favoris</Text>}
       // ce qui s'affiche quand la liste est vide
       ListEmptyComponent={
-        <Text style={styles.vide}>
+        <Text style={[styles.vide, { color: c.texteDoux }]}>
           Aucun favori pour l'instant. Ouvre une fiche et appuie sur le cœur.
         </Text>
       }
@@ -37,8 +40,8 @@ export default function Favoris() {
             onPress={() => router.push(`/pokemon/${item.number}`)}
           >
             <Image source={{ uri: `${ARTWORK}${item.number}.png` }} style={styles.image} contentFit="contain" cachePolicy="memory-disk" />
-            <Text style={styles.numero}>#{item.number}</Text>
-            <Text style={styles.nom}>{item.name}</Text>
+            <Text style={[styles.numero, { color: c.texteDoux }]}>#{item.number}</Text>
+            <Text style={[styles.nom, { color: c.texte }]}>{item.name}</Text>
             <View style={styles.types}>
               {item.types.map((t) => (
                 <TypeBadge key={t} type={t} />

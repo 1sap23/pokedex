@@ -1,3 +1,4 @@
+import { useTheme } from "../../context/Theme";
 import { useState } from "react";
 import { ScrollView, View, Text, Pressable, StyleSheet } from "react-native";
 import { TYPE_COLORS } from "../../components/TypeBadge";
@@ -6,6 +7,8 @@ import { TYPES } from "../../data/types";
 
 // phase 2 : on choisit un ou deux types et on voit ce qui leur fait mal
 export default function Combat() {
+  // thème : les couleurs du mode clair ou sombre
+  const { couleurs: c } = useTheme();
   const [choisis, setChoisis] = useState([]); // au plus 2 types
 
   function choisir(type) {
@@ -22,9 +25,9 @@ export default function Combat() {
   }
 
   return (
-    <ScrollView style={styles.page} contentContainerStyle={styles.contenu}>
-      <Text style={styles.titre}>Calculateur de types</Text>
-      <Text style={styles.texte}>Choisis un ou deux types.</Text>
+    <ScrollView style={[styles.page, { backgroundColor: c.fond }]} contentContainerStyle={styles.contenu}>
+      <Text style={[styles.titre, { color: c.texte }]}>Calculateur de types</Text>
+      <Text style={[styles.texte, { color: c.texteDoux }]}>Choisis un ou deux types.</Text>
 
       <View style={styles.grille}>
         {TYPES.map((t) => {
@@ -34,6 +37,7 @@ export default function Combat() {
               key={t}
               style={[
                 styles.type,
+                { backgroundColor: c.surface },
                 { borderColor: TYPE_COLORS[t] },
                 // le type choisi est rempli de sa couleur
                 choisi && { backgroundColor: TYPE_COLORS[t] },
@@ -49,8 +53,8 @@ export default function Combat() {
       </View>
 
       {choisis.length > 0 && (
-        <View style={styles.bloc}>
-          <Text style={styles.titreBloc}>Un Pokémon {choisis.join(" / ")}</Text>
+        <View style={[styles.bloc, { backgroundColor: c.surface }]}>
+          <Text style={[styles.titreBloc, { color: c.texte }]}>Un Pokémon {choisis.join(" / ")}</Text>
           <Faiblesses types={choisis} />
           <Pressable onPress={() => setChoisis([])}>
             <Text style={styles.effacer}>Effacer</Text>

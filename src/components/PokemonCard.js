@@ -1,3 +1,4 @@
+import { useTheme } from "../context/Theme";
 // ANCIEN (avant la phase 4) : import { View, Text, Image, Pressable, StyleSheet } from "react-native";
 import { View, Text, Pressable, StyleSheet } from "react-native";
 // phase 4 : l'Image d'expo-image garde les images en cache (plus rapide)
@@ -9,6 +10,8 @@ const ARTWORK =
   "/master/sprites/pokemon/other/official-artwork/";
 
 export default function PokemonCard({ number, name, type, captured, onToggle }) {
+  // thème : les couleurs du mode clair ou sombre
+  const { couleurs: c } = useTheme();
   // la couleur de la carte depend du type
   // const color = TYPE_COLORS[type];
   // séance 6 : l'API ne donne pas le type dans la liste, alors gris par défaut
@@ -20,13 +23,15 @@ export default function PokemonCard({ number, name, type, captured, onToggle }) 
         styles.card,
         { backgroundColor: color + "33", borderColor: color },
         captured && styles.capturee,
+        // en sombre, la carte capturée garde la couleur du type
+        captured && c.fond === "#0f172a" && { backgroundColor: color + "66" },
       ]}
     >
       <Image source={{ uri: `${ARTWORK}${number}.png` }} style={styles.image} contentFit="contain" cachePolicy="memory-disk" />
       {/* ANCIEN (séance 3, une seule colonne) : <View style={{ flex: 1 }}> */}
       <View style={styles.infos}>
-        <Text style={styles.numero}>#{number}</Text>
-        <Text style={styles.nom}>{name}</Text>
+        <Text style={[styles.numero, { color: c.texteDoux }]}>#{number}</Text>
+        <Text style={[styles.nom, { color: c.texte }]}>{name}</Text>
         {/* <TypeBadge type={type} /> */}
         {type && <TypeBadge type={type} />}
       </View>

@@ -1,3 +1,4 @@
+import { useTheme } from "../../context/Theme";
 // ANCIEN (séance 3 à 5) : import { useState } from "react";
 import { useState, useEffect } from "react";
 import { router } from "expo-router";
@@ -46,6 +47,8 @@ function question(debut, fin) {
 // ];
 
 export default function Index() {
+  // thème : les couleurs du mode clair ou sombre
+  const { couleurs: c } = useTheme();
   // null au départ : la liste n'est pas encore arrivée
   const [pokemons, setPokemons] = useState(null);
   const [balls, setBalls] = useState(0);
@@ -115,7 +118,7 @@ export default function Index() {
   // tant que la liste n'est pas arrivée, on affiche le rond qui tourne
   if (pokemons === null) {
     return (
-      <View style={styles.chargement}>
+      <View style={[styles.chargement, { backgroundColor: c.fond }]}>
         <ActivityIndicator size="large" color="#2f5be7" />
       </View>
     );
@@ -171,7 +174,7 @@ export default function Index() {
 
   // ANCIEN (séance 3) : ScrollView + .map(), remplacé par la FlatList en dessous
   // return (
-  //   <ScrollView style={styles.page} contentContainerStyle={styles.contenu}>
+  //   <ScrollView style={[styles.page, { backgroundColor: c.fond }]} contentContainerStyle={styles.contenu}>
   //     <Titre texte="Mon Pokédex" sousTitre={`${POKEMONS.length} Pokémon`} />
   //     <Text style={styles.captures}>{captured.length} Pokémon capturés</Text>
   //
@@ -207,7 +210,7 @@ export default function Index() {
   //       </Text>
   //     </Pressable>
   //
-  //     {visibles.length === 0 && <Text>Aucun Pokémon trouvé</Text>}
+  //     {visibles.length === 0 && <Text style={{ color: c.texteDoux }}>Aucun Pokémon trouvé</Text>}
   //
   //     {visibles.map((p) => (
   //       <PokemonCard
@@ -224,7 +227,7 @@ export default function Index() {
 
   return (
     <FlatList
-      style={styles.page}
+      style={[styles.page, { backgroundColor: c.fond }]}
       contentContainerStyle={styles.contenu}
       // data={visibles}
       data={tries}
@@ -281,38 +284,39 @@ export default function Index() {
 
           {/* phase 1 : trois petites cartes côte à côte */}
           <View style={styles.statsLigne}>
-            <View style={styles.statCarte}>
-              <Text style={styles.statNombre}>{pokemons.length}</Text>
-              <Text style={styles.statTexte}>Pokémon</Text>
+            <View style={[styles.statCarte, { backgroundColor: c.surface }]}>
+              <Text style={[styles.statNombre, { color: c.texte }]}>{pokemons.length}</Text>
+              <Text style={[styles.statTexte, { color: c.texteDoux }]}>Pokémon</Text>
             </View>
-            <View style={styles.statCarte}>
-              <Text style={[styles.statNombre, { color: "#16a34a" }]}>{captured.length}</Text>
-              <Text style={styles.statTexte}>capturés</Text>
+            <View style={[styles.statCarte, { backgroundColor: c.surface }]}>
+              <Text style={[styles.statNombre, { color: c.texte }, { color: "#16a34a" }]}>{captured.length}</Text>
+              <Text style={[styles.statTexte, { color: c.texteDoux }]}>capturés</Text>
             </View>
             {/* le sac de Poké Balls, avec des petits boutons - et + */}
-            <View style={styles.statCarte}>
+            <View style={[styles.statCarte, { backgroundColor: c.surface }]}>
               <View style={styles.sacLigne}>
                 <Pressable style={styles.petitBouton} onPress={enlever}>
                   <Text style={styles.petitBoutonTexte}>-</Text>
                 </Pressable>
-                <Text style={styles.statNombre}>{balls}</Text>
+                <Text style={[styles.statNombre, { color: c.texte }]}>{balls}</Text>
                 <Pressable style={styles.petitBouton} onPress={ajouter}>
                   <Text style={styles.petitBoutonTexte}>+</Text>
                 </Pressable>
               </View>
               {/* un appui long sur « Poké Balls » vide le sac */}
               <Pressable onLongPress={() => setBalls(0)}>
-                <Text style={styles.statTexte}>Poké Balls</Text>
+                <Text style={[styles.statTexte, { color: c.texteDoux }]}>Poké Balls</Text>
               </Pressable>
             </View>
           </View>
 
           {/* la barre de recherche avec une loupe */}
-          <View style={styles.rechercheLigne}>
+          <View style={[styles.rechercheLigne, { backgroundColor: c.surface }]}>
             <Ionicons name="search" size={18} color="#9ca3af" />
             <TextInput
-              style={styles.rechercheChamp}
+              style={[styles.rechercheChamp, { color: c.texte }]}
               placeholder="Rechercher un Pokémon"
+              placeholderTextColor={c.texteDoux}
               value={search}
               onChangeText={setSearch}
             />
@@ -358,7 +362,7 @@ export default function Index() {
 
           <Aide />
 
-          {visibles.length === 0 && <Text>Aucun Pokémon trouvé</Text>}
+          {visibles.length === 0 && <Text style={{ color: c.texteDoux }}>Aucun Pokémon trouvé</Text>}
         </View>
       }
       renderItem={({ item }) => (
