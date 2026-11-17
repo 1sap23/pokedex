@@ -21,6 +21,16 @@ export default function TabsLayout() {
           ),
         }}
       />
+      {/* phase 2 : le calculateur de types */}
+      <Tabs.Screen
+        name="combat"
+        options={{
+          title: "Combat",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="flash" size={size} color={color} />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="profil"
         options={{

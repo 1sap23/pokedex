@@ -10,6 +10,7 @@ import { Stack, router, useLocalSearchParams } from "expo-router";
 // ANCIEN (séance 6) : import TypeBadge from "../../components/TypeBadge";
 import TypeBadge, { TYPE_COLORS } from "../../components/TypeBadge";
 import { Ionicons } from "@expo/vector-icons";
+import Faiblesses from "../../components/Faiblesses";
 
 const ARTWORK =
   "https://raw.githubusercontent.com/PokeAPI/sprites" +
@@ -262,7 +263,25 @@ export default function FichePokemon() {
               Évolutions
             </Text>
           </Pressable>
+          {/* phase 2 : l'onglet combat */}
+          <Pressable
+            style={[styles.onglet, onglet === "combat" && { backgroundColor: color }]}
+            onPress={() => setOnglet("combat")}
+          >
+            <Text style={[styles.ongletTexte, onglet === "combat" && styles.ongletTexteChoisi]}>
+              Combat
+            </Text>
+          </Pressable>
         </View>
+
+        {/* ===== onglet Combat ===== */}
+        {onglet === "combat" && (
+          <View style={styles.bloc}>
+            <Text style={styles.titreBloc}>Faiblesses et résistances</Text>
+            {/* les types du Pokémon en français, ex : ["Feu", "Vol"] */}
+            <Faiblesses types={pokemon.types.map((t) => TYPES_FR[t.type.name])} />
+          </View>
+        )}
 
         {/* ===== onglet À propos ===== */}
         {onglet === "apropos" && (
@@ -400,7 +419,8 @@ const styles = StyleSheet.create({
   boutonShinyTexte: { color: "#ffffff", fontWeight: "bold" },
   onglets: { flexDirection: "row", backgroundColor: "#e5e7eb", borderRadius: 14, padding: 4, marginBottom: 16 },
   onglet: { flex: 1, paddingVertical: 8, borderRadius: 10, alignItems: "center" },
-  ongletTexte: { fontWeight: "bold", color: "#6b7280" },
+  // ongletTexte: { fontWeight: "bold", color: "#6b7280" },
+  ongletTexte: { fontSize: 13, fontWeight: "bold", color: "#6b7280" }, // plus petit : 4 onglets
   ongletTexteChoisi: { color: "#ffffff" },
   talent: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 6 },
   talentNom: { fontSize: 16, color: "#111827" },
