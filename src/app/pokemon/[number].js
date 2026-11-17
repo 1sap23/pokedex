@@ -15,7 +15,10 @@ import { Stack, router, useLocalSearchParams } from "expo-router";
 import TypeBadge, { TYPE_COLORS } from "../../components/TypeBadge";
 import { Ionicons } from "@expo/vector-icons";
 import Faiblesses from "../../components/Faiblesses";
-import { TYPES_FR } from "../../data/types";
+import { TYPES_FR, TYPES, efficacite } from "../../data/types";
+import { chargerAttaques } from "../../data/api";
+import CarteAttaque from "../../components/CarteAttaque";
+import TypeIcone from "../../components/TypeIcone";
 import { useCollection } from "../../context/Collection";
 import CarteHolo from "../../components/CarteHolo";
 import SceneType from "../../components/SceneType";
@@ -78,6 +81,8 @@ export default function FichePokemon() {
   const [evolutions, setEvolutions] = useState([]);
   // phase 1 : les talents, l'onglet affiché et la version Shiny
   const [talents, setTalents] = useState([]);
+  // attaques : null tant qu'elles ne sont pas arrivées
+  const [attaques, setAttaques] = useState(null);
   const [onglet, setOnglet] = useState("apropos");
   const [shiny, setShiny] = useState(false);
   // phase 3 : favoris et équipe, partagés avec les onglets
@@ -204,6 +209,15 @@ export default function FichePokemon() {
 
   useEffect(() => {
     charger();
+  }, []);
+
+  // attaques : chargées à part, pour ne pas ralentir le reste de la fiche
+  async function chargerLesAttaques() {
+    setAttaques(await chargerAttaques(number));
+  }
+
+  useEffect(() => {
+    chargerLesAttaques();
   }, []);
 
   if (pokemon === null) {
@@ -379,10 +393,33 @@ export default function FichePokemon() {
 
         {/* ===== onglet Combat ===== */}
         {onglet === "combat" && (
-          <View style={[styles.bloc, { backgroundColor: c.surface }]}>
-            <Text style={[styles.titreBloc, { color: c.texte }]}>Faiblesses et résistances</Text>
-            {/* les types du Pokémon en français, ex : ["Feu", "Vol"] */}
-            <Faiblesses types={pokemon.types.map((t) => TYPES_FR[t.type.name])} />
+          <View>
+            {/* attaques : contre quels types ses attaques de son type font x2 */}
+            <View style={[styles.bloc, { backgroundColor: c.surface }]}>
+              <Text style={[styles.titreBloc, { color: c.texte }]}>Super efficace contre</Text>
+              <View style={styles.efficaces}>
+                {TYPES.filter((cible) => resume.types.some((t) => efficacite(t, [cible]) > 1)).map((cible) => (
+                  <TypeIcone key={cible} type={cible} taille={30} />
+                ))}
+              </View>
+            </View>
+
+            <View style={[styles.bloc, { backgroundColor: c.surface }]}>
+              <Text style={[styles.titreBloc, { color: c.texte }]}>Faiblesses et résistances</Text>
+              {/* les types du Pokémon en français, ex : ["Feu", "Vol"] */}
+              <Faiblesses types={pokemon.types.map((t) => TYPES_FR[t.type.name])} />
+            </View>
+
+            {/* attaques : toutes ses attaques, en cartes de combat */}
+            <Text style={[styles.titreAttaques, { color: c.texte }]}>
+              Attaques {attaques !== null && `(${attaques.length})`}
+            </Text>
+            <Text style={[styles.aideAttaques, { color: c.texteDoux }]}>
+              Apprises en montant de niveau · touche une attaque pour la décrire
+            </Text>
+            {attaques === null && <ActivityIndicator color={color} style={{ marginVertical: 20 }} />}
+            {attaques !== null &&
+              attaques.map((a, i) => <CarteAttaque key={a.id + "-" + i} attaque={a} />)}
           </View>
         )}
 
@@ -529,6 +566,10 @@ const styles = StyleSheet.create({
   // zoneCarte: { paddingTop: 20, paddingBottom: 8, alignItems: "center" },
   zoneCarte: { paddingTop: 4, paddingBottom: 8, alignItems: "center" }, // scène : les boutons juste sous l'image
   astuce: { fontSize: 12, color: "#94a3b8", marginTop: 12, marginBottom: 10 },
+  // attaques
+  efficaces: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  titreAttaques: { fontSize: 22, fontWeight: "900", marginTop: 4 },
+  aideAttaques: { fontSize: 12, marginBottom: 10 },
   boutonsBandeau: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 8 },
   onglets: { flexDirection: "row", backgroundColor: "#e5e7eb", borderRadius: 14, padding: 4, marginBottom: 16 },
   onglet: { flex: 1, paddingVertical: 8, borderRadius: 10, alignItems: "center" },

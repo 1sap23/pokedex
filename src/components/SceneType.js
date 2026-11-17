@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import TypeIcone, { ICONES } from "./TypeIcone";
 
 // scène : l'ambiance de chaque type (du plus sombre au plus clair)
-const AMBIANCES = {
+export const AMBIANCES = { // exporté : les cartes d'attaque utilisent les mêmes ambiances
   Feu: ["#3b0a02", "#c2410c", "#fbbf24"],
   Eau: ["#020617", "#1e3a8a", "#22d3ee"],
   Plante: ["#022c16", "#15803d", "#bef264"],

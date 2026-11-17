@@ -86,3 +86,63 @@ export async function chargerCarte(number) {
     types: pokemon.types.map((t) => TYPES_FR[t.type.name]),
   };
 }
+
+// attaques : les jeux du plus récent au plus ancien.
+// on prend le premier jeu où le Pokémon apprend des attaques
+// (25 = Écarlate/Violet, 20 = Épée/Bouclier, 23 = Diamant Étincelant...)
+const JEUX = [25, 20, 23, 18, 17, 16, 15, 14, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1];
+
+const CATEGORIES = { physical: "Physique", special: "Spéciale", status: "Statut" };
+
+// les attaques qu'un Pokémon apprend en montant de niveau
+export async function chargerAttaques(id) {
+  const question = `{
+    pokemonmove(where: { pokemon_id: { _eq: ${id} }, movelearnmethod: { name: { _eq: "level-up" } } }, order_by: { level: asc }) {
+      level
+      version_group_id
+      move {
+        id
+        name
+        power
+        accuracy
+        pp
+        type { name }
+        movedamageclass { name }
+        movenames(where: { language_id: { _eq: 5 } }) { name }
+        movetarget { movetargetnames(where: { language_id: { _eq: 5 } }) { name } }
+        moveflavortexts(where: { language_id: { _eq: 5 } }, order_by: { version_group_id: desc }, limit: 1) { flavor_text }
+      }
+    }
+  }`;
+  const reponse = await fetch(GRAPHQL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query: question }),
+  });
+  const data = await reponse.json();
+  const toutes = data.data.pokemonmove;
+
+  // le jeu le plus récent qui a des attaques pour ce Pokémon
+  const jeu = JEUX.find((j) => toutes.some((a) => a.version_group_id === j));
+
+  return toutes
+    .filter((a) => a.version_group_id === jeu)
+    .map((a) => {
+      const m = a.move;
+      const nom = m.movenames[0];
+      const portee = m.movetarget ? m.movetarget.movetargetnames[0] : null;
+      const texte = m.moveflavortexts[0];
+      return {
+        id: m.id,
+        niveau: a.level,
+        nom: nom ? nom.name : m.name,
+        type: TYPES_FR[m.type.name],
+        categorie: CATEGORIES[m.movedamageclass.name],
+        puissance: m.power, // null pour les attaques de statut
+        precision: m.accuracy, // null : ne rate jamais
+        pp: m.pp, // combien de fois on peut l'utiliser
+        portee: portee ? portee.name : "",
+        description: texte ? texte.flavor_text.replaceAll("\n", " ") : "",
+      };
+    });
+}
